@@ -6,7 +6,7 @@
 package com.ec.mirian.service;
 
 import com.ec.mirian.enumerado.TipoDocumentoEnum;
-import com.ec.mirian.gui.jframe.VentanaPrincipal;
+import com.ec.mirian.internalFrame.IFactura;
 import com.ec.mirian.repository.InformacionRepository;
 import com.ec.mirian.repository.PersonaRepository;
 import com.ec.mirian.repository.VentaRepository;
@@ -97,15 +97,15 @@ public class FacturaService {
         info.setFechaEmision(Util.getStringFromDate(Util.getDateFromString(ventaCredito[1],"yyyy-MM-dd HH:mm:ss"),"dd/MM/yyyy"));
         info.setTotalSinImpuestos(ventaCredito[14]);
         info.setTotalDescuento(ventaCredito[16]);
-        VentanaPrincipal.getInstance().setPorDescuento(!ventaCredito[15].equals("") ? ventaCredito[15] : "0");
+        IFactura.getInstance().setPorDescuento(!ventaCredito[15].equals("") ? ventaCredito[15] : "0");
         //info.setImporteTotal(ventaCredito[19]);
         info.setTipoIdentificacionComprador(Util.getTipoDocumento(ventaCredito[8]));
         info.setDireccionComprador(personaEmisor[12]);
         
-        VentanaPrincipal.getInstance().setCodigoCliente(personaEmisor[0]);
-        VentanaPrincipal.getInstance().setCorreo(personaEmisor[13]);
-        VentanaPrincipal.getInstance().setTxtCorreoCliente(personaEmisor[13]);
-        VentanaPrincipal.getInstance().setTxtCiudadCliente(personaEmisor[11]);
+        IFactura.getInstance().setCodigoCliente(personaEmisor[0]);
+        IFactura.getInstance().setCorreo(personaEmisor[13]);
+        IFactura.getInstance().setTxtCorreoCliente(personaEmisor[13]);
+        IFactura.getInstance().setTxtCiudadCliente(personaEmisor[11]);
         
         InformacionRepository ir = new InformacionRepository();
         PropertiesUtil.getInstanceProperties();
@@ -149,12 +149,12 @@ public class FacturaService {
         
         CampoAdicional ca1 = new CampoAdicional();
         ca1.setNombre("ciudad");
-        ca1.setValue(VentanaPrincipal.getInstance().getTxtCiudadCliente());
+        ca1.setValue(IFactura.getInstance().getTxtCiudadCliente());
         list.add(ca1);
         
         CampoAdicional ca2 = new CampoAdicional();
         ca2.setNombre("correo");
-        ca2.setValue(VentanaPrincipal.getInstance().getTxtCorreoCliente());
+        ca2.setValue(IFactura.getInstance().getTxtCorreoCliente());
         list.add(ca2);
         return list;
     }
@@ -171,7 +171,7 @@ public class FacturaService {
             fd.setCodigoAuxiliar(venta[1]);
             fd.setCodigoPrincipal(venta[2]);
             
-            String PorDesc = VentanaPrincipal.getInstance().getPorDescuento();
+            String PorDesc = IFactura.getInstance().getPorDescuento();
             
             Double subtotal = Util.parseDouble(venta[4]) * Util.parseDouble(venta[3]);
             fd.setPrecioTotalSinImpuesto(Util.dosDigitos(subtotal));
@@ -256,9 +256,9 @@ public class FacturaService {
         factura.setDetalles(getDetalles());
         factura.setInfoAdicional(getListCamposAdicional());
         getSecuencial();
-        VentanaPrincipal.getInstance().setSecuencial(factura.getInfoTributaria().getSecuencial());
+        IFactura.getInstance().setSecuencial(factura.getInfoTributaria().getSecuencial());
         generarClave();
-        VentanaPrincipal.getInstance().setClaveAcceso(factura.getInfoTributaria().getClaveAcceso());
+        IFactura.getInstance().setClaveAcceso(factura.getInfoTributaria().getClaveAcceso());
         return generarXML();
     }
     

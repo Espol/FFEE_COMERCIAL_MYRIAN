@@ -3,11 +3,57 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ec.mirian.internalFrame;
 
+import com.ec.mirian.bean.MailSetting;
+import com.ec.mirian.domain.Configuracion;
+import com.ec.mirian.domain.VentfacCabecera;
+import com.ec.mirian.enumerado.TipoDocumentoEnum;
 import com.ec.mirian.gui.jframe.DLocker;
+import com.ec.mirian.gui.jframe.VentanaPrincipal;
 import com.ec.mirian.models.FacturaDetalleModel;
+import com.ec.mirian.service.ConexionService;
+import com.ec.mirian.service.FactoryService;
+import com.ec.mirian.service.FacturaService;
+import com.ec.mirian.so.Linux;
+import com.ec.mirian.so.Mac;
+import com.ec.mirian.so.So;
+import com.ec.mirian.so.Windows;
+import com.ec.mirian.util.Constante;
+import com.ec.mirian.util.PropertiesMail;
+import com.ec.mirian.util.PropertiesUtil;
+import com.ec.mirian.util.Util;
+import com.ec.mirian.util.XStreamAutorizacion;
+import com.mirian.correo.notificacion.EnviarNotificacion;
+import com.mirian.correo.notificacion.MailProperties;
+import com.mirian.correo.notificacion.Notificacion;
+import com.mirian.envio.EnvioAutorizar;
+import com.mirian.envio.EnvioRecepcion;
+import com.mirian.pdf.service.PdfFactory;
+import com.mirian.pdf.service.PdfServices;
+import com.mirian.validacion.exception.ValidacionException;
+import com.mirian.validacion.services.ValidacionFactory;
+import ec.gob.sri.comprobantes.ws.aut.RespuestaComprobante;
+import ec.gob.sri.comprobantes.ws.rec.RespuestaSolicitud;
+import ec.incloud.ce.bean.common.InfoTributaria;
+import ec.incloud.ce.bean.factura.Factura;
+import ec.incloud.ce.bean.factura.FacturaDetalle;
+import ec.incloud.ce.bean.factura.InfoFactura;
+import ec.incloud.ce.firma.exception.FirmaException;
+import ec.incloud.ce.firma.services.FirmaFactory;
+import ec.incloud.ce.sri.services.AutorizacionException;
+import ec.incloud.ce.sri.services.RecepcionException;
+import ec.incloud.ce.xml.exception.XmlException;
+import ec.incloud.ce.xml.services.XmlFactory;
+import ec.incloud.ce.xml.services.XmlServices;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -15,11 +61,19 @@ import com.ec.mirian.models.FacturaDetalleModel;
  */
 public class IFactura extends javax.swing.JInternalFrame {
 
+    private static IFactura INSTANCE;
+    
+    public static IFactura getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * Creates new form IFactura
      */
     public IFactura() {
         initComponents();
+        INSTANCE = this;
+        cargarConfiguracion();
     }
 
     /**
@@ -121,7 +175,7 @@ public class IFactura extends javax.swing.JInternalFrame {
         jLabel22 = new javax.swing.JLabel();
         txtFechaAutorizacion = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
-        edtConsolaFactura = new javax.swing.JEditorPane();
+        edtConsola = new javax.swing.JEditorPane();
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -515,9 +569,9 @@ public class IFactura extends javax.swing.JInternalFrame {
 
         jPanel18.add(jPanel19, java.awt.BorderLayout.PAGE_START);
 
-        edtConsolaFactura.setBorder(null);
-        edtConsolaFactura.setContentType("text/html"); // NOI18N
-        jScrollPane2.setViewportView(edtConsolaFactura);
+        edtConsola.setBorder(null);
+        edtConsola.setContentType("text/html"); // NOI18N
+        jScrollPane2.setViewportView(edtConsola);
 
         jPanel18.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
@@ -556,7 +610,7 @@ public class IFactura extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    confirmarDatos();
+                    confirmarDatos();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -573,7 +627,7 @@ public class IFactura extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    generacionXML();
+                    generacionXML();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -598,7 +652,7 @@ public class IFactura extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    validarAndFirmarXML();
+                    validarAndFirmarXML();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -614,7 +668,7 @@ public class IFactura extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    recepcionSRI();
+                    recepcionSRI();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -631,7 +685,7 @@ public class IFactura extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    autorizadoSRI();
+                    autorizadoSRI();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -645,14 +699,431 @@ public class IFactura extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRutaXmlActionPerformed
 
+    private void confirmarDatos() {
+        String numeroPedido = txtNumeroPedido.getText();
+        if (numeroPedido != null && !numeroPedido.isEmpty()) {
+            try {
+                confirmarFactura(numeroPedido);
+            } catch (SQLException ex) {
+                btnXml.setEnabled(false);
+                Util.mostrarError(ex, "Error1 SQL Exception");
+            } catch (IOException ex) {
+                btnXml.setEnabled(false);
+                Util.mostrarError(ex, "Error2 IOException");
+            } catch (XmlException ex) {
+                btnXml.setEnabled(false);
+                Util.mostrarError(ex, "Error3 XmlException");
+            } catch (ClassNotFoundException ex) {
+                btnXml.setEnabled(false);
+                Util.mostrarError(ex, "Error4 ClassNotFoundException");
+            }
+        } else {
+            Util.mostrarWarning("Debe ingresar el numero de pedido y Tipo de Documento");
+        }
+    }
 
+    private void confirmarFactura(String numeroPedido) throws SQLException, IOException, XmlException, ClassNotFoundException {
+        FacturaService gf = FactoryService.createFacturaService();
+        gf.setNumVentCred(numeroPedido);
+        factura = gf.obtenerInformacion();
+        InfoTributaria it = factura.getInfoTributaria();
+        txtRazonSocial.setText(it.getRazonSocial());
+        txtNombreComercial.setText(it.getNombreComercial());
+        txtDocumento.setText(it.getRuc());
+        txtEstablecimiento.setText(it.getEstab());
+        txtPtoEmision.setText(it.getPtoEmi());
+        txtSecuencial.setText(it.getSecuencial());
+        txtMatriz.setText(it.getDirMatriz());
+
+        InfoFactura ifa = factura.getInfoFactura();
+        txtFechaEmision.setText(ifa.getFechaEmision());
+        txtTipoIdComprador.setText(ifa.getTipoIdentificacionComprador());
+        txtRsComprador.setText(ifa.getRazonSocialComprador());
+        txtIdComprador.setText(ifa.getIdentificacionComprador());
+        txtDirComprador.setText(ifa.getDireccionComprador());
+        txtDescuento.setText(ifa.getTotalDescuento());
+        Util.setText(txtValor, ifa.getTotalSinImpuestos());
+        Util.setText(txtPorIva, ifa.getTotalConImpuestos().get(0).getTarifa());
+        Double sub = Double.parseDouble(Util.getText(txtValor)) - Double.parseDouble(Util.getText(txtDescuento));
+        Util.setText(txtSubTotal, Util.dosDigitos(sub));
+        Util.setText(txtIva, ifa.getTotalConImpuestos().get(0).getValor());
+        txtImporteTotal.setText(ifa.getImporteTotal());
+
+        List<FacturaDetalle> detalles = factura.getDetalles();
+        fdModel.limpiar();
+        tbDetalle.setModel(fdModel);
+        for (FacturaDetalle fd : detalles) {
+            fdModel.addRowFacturaDetalleModel(fd);
+        }
+        tbDetalle.updateUI();
+        btnXml.setEnabled(true);
+    }
+
+    public void generacionXML() {
+        String numeroPedido = txtNumeroPedido.getText();
+        if (numeroPedido != null && !numeroPedido.isEmpty()) {
+            ConexionService cs = new ConexionService();
+            VentfacCabecera cab = cs.getVentaCabecera(numeroPedido);
+            if (cab == null) {
+                try {
+                    if (emitirAsiMismo() == 0) {
+                        enableBotones(true);
+                        FacturaService gf = new FacturaService();
+                        gf.setNumVentCred(numeroPedido);
+
+                        String xml = gf.generarFacturaXML();
+                        //gf.saveInformacion();//habilitar esta opcion
+                        Util.setText(txtRutaXml, xml);
+                        Util.mostrarExisto("Se Genero XMl con Exito");
+                    } else {
+                        enableBotones(false);
+                    }
+                } catch (SQLException ex) {
+                    Util.mostrarError(ex, "Error1 SQL Exception");
+                } catch (IOException ex) {
+                    Util.mostrarError(ex, "Error2 IOException");
+                } catch (XmlException ex) {
+                    Util.mostrarError(ex, "Error3 XmlException");
+                } catch (ClassNotFoundException ex) {
+                    Util.mostrarError(ex, "Error4 ClassNotFoundException");
+                }
+            } else {
+                Util.setText(txtRutaXml, cab.getXml());
+                Util.setText(txtXmlAutorizado, cab.getXmlAutorizado());
+                Util.setText(txtPdf, cab.getPdf());
+                Util.setText(txtclaveAcceso, cab.getClaveAcceso());
+                Util.mostrarWarning("Ya se genero El XML para Este documento");
+            }
+        }
+    }
+    
+    private int emitirAsiMismo() throws UnsupportedEncodingException, IOException {
+        PropertiesUtil.getInstanceProperties();
+        String idEmisor = PropertiesUtil.getValorPathXML("mirian.emisor.id");
+        if (Util.getText(txtDescuento).equals("0.00") && Util.getText(txtCodigoCliente).equalsIgnoreCase(idEmisor)) {
+            int respuesta = Util.mensajeConfirmacion();//si = 0, no = 1
+            return respuesta;
+        } else {
+            return 0;
+        }
+    }
+    
+    private void enableBotones(boolean flag) {
+        Util.enableButton(btnXml, flag);
+        Util.enableButton(btnAutorizacion, flag);
+        Util.enableButton(btnRecepcion, flag);
+        Util.enableButton(btnValidar, flag);
+    }
+
+    public void validarAndFirmarXML() {
+        try {
+            agregarTextoAEditorConsola("<html>");
+            firmarXML();
+            validarXML();
+        } catch (FirmaException | ValidacionException | XmlException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void firmarXML() throws FirmaException {
+        String xml = Util.getText(txtRutaXml);
+        FirmaFactory.createFirmaServices().firma(xml,
+                config.getFirma(),
+                config.getClaveFirma());
+        agregarLog("Se realizo la firma Electronica del XML", 1);
+    }
+    
+    private void cargarConfiguracion() {
+        config = getConfiguracion();
+    }
+    
+    private Configuracion getConfiguracion() {
+        ConexionService cs = FactoryService.createConexionService();
+        return cs.getConfiguracionById(Constante.ID_CONFIGURACION_DEFECTO);
+    }
+    
+    private void validarXML() throws ValidacionException, XmlException, FirmaException {
+        XmlServices<Factura> xmlServices = XmlFactory.getFacturaXmlServices();
+        Factura comprobante = (Factura) xmlServices.getComprobanteDePathArchivo(txtRutaXml.getText());
+        ValidacionFactory.createValidacionFacturaServices().validar(comprobante, config.getXsdfactura());
+        agregarLog("XML se valido Correctamente", 1);
+    }
+    
+    private void recepcionSRI() {
+        try {
+            enviarARecepcion();
+        } catch (RecepcionException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void enviarARecepcion() throws RecepcionException {
+        agregarLog("Enviando a Recepcion", 1);
+        RespuestaSolicitud rs = EnvioRecepcion.create().enviarToRecepcion(Util.getText(txtRutaXml));
+        obtenerRespuesta(rs);
+    }
+
+    private void obtenerRespuesta(RespuestaSolicitud rs) {
+        Util.setText(txtEstado, rs.getEstado());
+        if (rs.getEstado().equalsIgnoreCase(Constante.RECIBIDA)) {
+            agregarLog(rs.getEstado(), 1);
+            agregarLog("El Documento se envio a Recepcion", 1);
+        } else {
+            agregarLog(rs.getEstado(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getClaveAcceso(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getIdentificador(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getInformacionAdicional(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getMensaje(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getTipo(), 3);
+        }
+    }
+    
+    private void autorizadoSRI() {
+        try {
+            agregarLog("Enviando a autorizacion", 1);
+            RespuestaComprobante rc = EnvioAutorizar.create().enviarAutorizar(Util.getText(txtclaveAcceso));
+            obtenerRespuestaComprobante(rc);
+        } catch (IOException | XmlException | AutorizacionException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void obtenerRespuestaComprobante(RespuestaComprobante rc) throws IOException, XmlException, Exception {
+        if (rc.getAutorizaciones().getAutorizacion() != null
+                && !rc.getAutorizaciones().getAutorizacion().isEmpty()) {
+            String estado = rc.getAutorizaciones().getAutorizacion().get(0).getEstado();
+            String fechaAutorizada = rc.getAutorizaciones().getAutorizacion().get(0).getFechaAutorizacion();
+            Util.setText(txtEstado, estado);
+            Util.setText(txtFechaAutorizacion, fechaAutorizada);
+            if (estado.equalsIgnoreCase(Constante.AUTORIZADO)) {
+                agregarLog(estado, 1);
+                agregarLog(fechaAutorizada, 1);
+                XStreamAutorizacion.getInstance().generarXml(rc, getPthAutorizado());
+                agregarLog("El Documento se envio a Autorizacion", 1);
+                pathPdf();
+                FacturaService gf = new FacturaService();
+                gf.setNumVentCred(Util.getText(txtNumeroPedido));
+                gf.saveInformacion();//habilitar esta opcion
+                generarPDF(rc);
+                enviarNotificacion();
+            } else {
+                agregarLog(estado, 3);
+                agregarLog(fechaAutorizada, 1);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getIdentificador(), 3);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getMensaje(), 3);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getInformacionAdicional(), 3);
+            }
+        } else {
+            Util.mostrarWarning("El Documento No ha sido Recepcionado, Por favor volver a enviar a Recepcion");
+        }
+    }
+    
+    private String getPthAutorizado() {
+        String xmlAutorizado = Util.getText(txtRutaXml).replace(td.getDirectorio() + "/", td.getDirectorio() + "/AUTORIZADO/");
+        Util.setText(txtXmlAutorizado, xmlAutorizado);
+        return xmlAutorizado;
+    }
+    
+    private void generarPDF(RespuestaComprobante rc) throws XmlException, Exception {
+        agregarLog("Generando el PDF", 1);
+        PdfServices pdfServices = PdfFactory.createPdfFacturaServices();
+        pdfServices.setPathIreport(JASPER_ROOT + Constante.FACTURA_JASPER);
+        pdfServices.setLogo(Util.getLogo());
+        pdfServices.setPathInfoAdicional(Util.getPathInfoAdicional());
+        XmlServices xmlServices = XmlFactory.getFacturaXmlServices();
+        pdfServices.generarPdf(xmlServices.getComprobanteDePathArchivo(Util.getText(txtRutaXml)),
+                Util.getText(txtPdf),
+                rc.getAutorizaciones().getAutorizacion().get(0).getNumeroAutorizacion(),
+                rc.getAutorizaciones().getAutorizacion().get(0).getFechaAutorizacion(),
+                null, null, "12");
+        agregarLog("PDF generado!...", 1);
+    }
+    
+    private void enviarNotificacion() throws IOException {
+        agregarLog("Enviando Correo ...", 1);
+        List<String> adjunto = new ArrayList<>();
+        adjunto.add(Util.getText(txtXmlAutorizado));
+        adjunto.add(Util.getText(txtPdf));
+
+        Notificacion notificacion = EnviarNotificacion.AUTORIZADO_CONFIRMACION;
+
+        String sriCorrelativo = Util.getText(txtEstablecimiento) + "-" + Util.getText(txtPtoEmision) + "-" + Util.getText(txtSecuencial);
+        notificacion.enviarCorreo(getMailProperties(getMailSetting()),
+                td.getDescripcion(),
+                sriCorrelativo,
+                Util.getText(txtNumeroPedido),
+                config.getAmbiente() == 2 ? correo : "mmoyanol1180@gmail.com",
+                "mmoyanol1180@gmail.com", NOTIFICACION_ROOT + Constante.AUTORIZADO_COMFIRMACION, adjunto);
+        agregarLog("Correo Enviado", 1);
+    }
+
+    public MailSetting getMailSetting() throws UnsupportedEncodingException, IOException {
+        MailSetting ms = new MailSetting();
+        PropertiesMail.getInstanceProperties();
+        ms.setHost(PropertiesMail.getValorAcceso("mail.smtp.host"));
+        ms.setPassword(PropertiesMail.getValorAcceso("mail.smtp.password"));
+        ms.setPort(PropertiesMail.getValorAcceso("mail.smtp.port"));
+        ms.setUser(PropertiesMail.getValorAcceso("mail.smtp.user"));
+        return ms;
+    }
+    
+    private MailProperties getMailProperties(final MailSetting ms) {
+        return new MailProperties() {
+
+            @Override
+            public String getHost() {
+                return ms.getHost();
+            }
+
+            @Override
+            public String getPort() {
+                return ms.getPort();
+            }
+
+            @Override
+            public String getUsuario() {
+                return ms.getUser();
+            }
+
+            @Override
+            public String getPassword() {
+                return ms.getPassword();
+            }
+        };
+    }
+    
+    private void agregarTextoAEditorConsola(String texto) {
+        log = texto;
+        edtConsola.setText(log);
+        DefaultCaret caret = (DefaultCaret) edtConsola.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+    }
+    
+    private void agregarLog(String mensaje, int i) {
+        agregarTextoAEditorConsola(obtenerTextoDeEditorConsola() + Util.convierteTextoAFormatoHTML(i, mensaje));
+    }
+    
+    public String obtenerTextoDeEditorConsola() {
+        if (log.length() > 6) {
+            return log.substring(0, log.length() - 7);
+        } else {
+            return log;
+        }
+    }
+    
+    public void pathPdf() {
+        Util.setText(txtPdf, Util.getText(txtXmlAutorizado).replace(".xml", ".pdf"));
+    }
+
+    public String getClaveAcceso() {
+        return Util.getText(txtclaveAcceso);
+    }
+
+    public String getXml() {
+        return Util.getText(txtRutaXml);
+    }
+
+    public String getXmlAutorizado() {
+        return Util.getText(txtXmlAutorizado);
+    }
+
+    public void setDescuento(String porcentajeDesc) {
+        Util.setText(txtDescuento, porcentajeDesc);
+    }
+
+    public void setPorDescuento(String porcentajeDesc) {
+        Util.setText(txtPorDescuento, porcentajeDesc);
+    }
+
+    public String getPorDescuento() {
+        return Util.getText(txtPorDescuento);
+    }
+
+    public void setSecuencial(String secuencial) {
+        Util.setText(txtSecuencial, secuencial);
+    }
+
+    public String getSecuencial() {
+        return Util.getText(txtSecuencial);
+    }
+
+    public void setClaveAcceso(String claveAcceso) {
+        Util.setText(txtclaveAcceso, claveAcceso);
+    }
+
+    public String getPdf() {
+        return Util.getText(txtPdf);
+    }
+
+    public void setValor(String valor) {
+        Util.setText(txtValor, valor);
+    }
+
+    public String getSubTotal() {
+        return Util.getText(txtSubTotal);
+    }
+
+    public void setTxtCiudadCliente(String ciudad) {
+        Util.setText(txtCiudadCliente, ciudad);
+    }
+
+    public String getTxtCiudadCliente() {
+        return Util.getText(txtCiudadCliente);
+    }
+
+    public void setTxtCorreoCliente(String correo) {
+        Util.setText(txtCorreoCliente, correo);
+    }
+
+    public String getTxtCorreoCliente() {
+        return Util.getText(txtCorreoCliente);
+    }
+
+    public void setCodigoCliente(String codigoCliente) {
+        Util.setText(txtCodigoCliente, codigoCliente);
+    }
+
+    public String getCodigoCliente() {
+        return Util.getText(txtCodigoCliente);
+    }
+
+    public String getEstabl() {
+        return Util.getText(txtEstablecimiento);
+    }
+
+    public String getPtoEmision() {
+        return Util.getText(txtPtoEmision);
+    }
+    
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+    
+    public String log = "";
+    private String correo;
+    private Factura factura;
+    private final FacturaDetalleModel fdModel = new FacturaDetalleModel();
+    private Configuracion config;
+    private final TipoDocumentoEnum td = TipoDocumentoEnum.FACTURA;
+    private final String JASPER_ROOT = So.isWindows() ? Windows.JASPER_ROOT : (So.isMac() ? Mac.JASPER_ROOT : Linux.JASPER_ROOT);
+    private final String NOTIFICACION_ROOT = So.isWindows() ? Windows.NOTIFICACION_ROOT : (So.isMac() ? Mac.NOTIFICACION_ROOT : Linux.NOTIFICACION_ROOT);
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAutorizacion;
     private javax.swing.JButton btnConfirmarDatos;
     private javax.swing.JButton btnRecepcion;
     private javax.swing.JButton btnValidar;
     private javax.swing.JButton btnXml;
-    private javax.swing.JEditorPane edtConsolaFactura;
+    private javax.swing.JEditorPane edtConsola;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;

@@ -13,8 +13,9 @@ import com.ec.mirian.domain.Cargo;
 import com.ec.mirian.domain.Configuracion;
 import com.ec.mirian.domain.VentfacCabecera;
 import com.ec.mirian.domain.VentfacDetalle;
+import com.ec.mirian.enumerado.TipoDocumentoEnum;
 import com.ec.mirian.factory.Factory;
-import com.ec.mirian.gui.jframe.VentanaPrincipal;
+import com.ec.mirian.internalFrame.IFactura;
 import com.ec.mirian.repository.CargosRepository;
 import com.ec.mirian.util.Util;
 import ec.incloud.ce.bean.factura.Factura;
@@ -46,7 +47,7 @@ public class ConexionService {
         this.saveCabecera(ven);
         this.saveDetalle(ven, det);
         Cargo c = this.saveCarga(cab);
-        c.setObservacion(c.getObservacion().replace("{0}", Util.eliminarCerosInicios(VentanaPrincipal.getInstance().getSecuencial())));
+        c.setObservacion(c.getObservacion().replace("{0}", Util.eliminarCerosInicios(IFactura.getInstance().getSecuencial())));
         CargosRepository cr = new CargosRepository();
         cr.saveCargas(c);
     }
@@ -94,11 +95,11 @@ public class ConexionService {
         VentfacCabecera ven = new VentfacCabecera();
         ven.setNumVentfac(Util.stringToLong(cab[0]));
         ven.setCiudad(cab[13]);
-        ven.setClaveAcceso(VentanaPrincipal.getInstance().getClaveAcceso());
+        ven.setClaveAcceso(IFactura.getInstance().getClaveAcceso());
         ven.setDireccion(cab[11]);
-        ven.setFacturaImpresa(VentanaPrincipal.getInstance().getEstabl() +"-"+
-                              VentanaPrincipal.getInstance().getPtoEmision() +"-"+
-                              VentanaPrincipal.getInstance().getSecuencial());
+        ven.setFacturaImpresa(IFactura.getInstance().getEstabl() +"-"+
+                              IFactura.getInstance().getPtoEmision() +"-"+
+                              IFactura.getInstance().getSecuencial());
         ven.setFeCreacion(Util.getDateFromString(cab[1], "yyyy-MM-dd HH:mm:ss"));
         ven.setUsrCreacion(cab[2]);
         ven.setFeUltmod(Util.getDateFromString(cab[3], "yyyy-MM-dd HH:mm:ss"));
@@ -118,13 +119,13 @@ public class ConexionService {
         ven.setUsrVentfact(cab[2]);
         ven.setVmDesct(Util.stringToBigDecimal(cab[16]));
         ven.setVmIva(Util.stringToBigDecimal(cab[18]));
-        ven.setSecuencial(VentanaPrincipal.getInstance().getSecuencial());
-        ven.setEstablecimiento(VentanaPrincipal.getInstance().getEstabl());
-        ven.setPuntoemision(VentanaPrincipal.getInstance().getPtoEmision());
-        ven.setXml(VentanaPrincipal.getInstance().getXml());
-        ven.setPdf(VentanaPrincipal.getInstance().getPdf());
-        ven.setXmlAutorizado(VentanaPrincipal.getInstance().getXmlAutorizado());
-        ven.setTipo(VentanaPrincipal.getInstance().getCodigoTipoDocumento());
+        ven.setSecuencial(IFactura.getInstance().getSecuencial());
+        ven.setEstablecimiento(IFactura.getInstance().getEstabl());
+        ven.setPuntoemision(IFactura.getInstance().getPtoEmision());
+        ven.setXml(IFactura.getInstance().getXml());
+        ven.setPdf(IFactura.getInstance().getPdf());
+        ven.setXmlAutorizado(IFactura.getInstance().getXmlAutorizado());
+        ven.setTipo(TipoDocumentoEnum.FACTURA.getCodigo());
         return ven;
     }
     

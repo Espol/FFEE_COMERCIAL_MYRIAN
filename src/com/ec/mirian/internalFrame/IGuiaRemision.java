@@ -6,6 +6,8 @@
 
 package com.ec.mirian.internalFrame;
 
+import com.ec.mirian.gui.jframe.DLocker;
+
 /**
  *
  * @author MARCELO
@@ -26,27 +28,249 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pnlGuiaRemision = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        lblFactura = new javax.swing.JLabel();
+        txtFactura = new javax.swing.JTextField();
+        btnConfirmarDatos = new javax.swing.JButton();
+        btnXml = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        txtRazonSocial = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtNombreComercial = new javax.swing.JTextField();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        txtMatriz = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        txtEstablecimiento = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txtPtoEmision = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txtSecuencial = new javax.swing.JTextField();
+        jLabel24 = new javax.swing.JLabel();
+        txtDocumento = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+
         setClosable(true);
         setMaximizable(true);
         setTitle(".:: GUIAS REMISION ::.");
+        getContentPane().setLayout(new java.awt.GridLayout());
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 394, Short.MAX_VALUE)
+        pnlGuiaRemision.setLayout(new java.awt.GridLayout());
+
+        jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.LINE_AXIS));
+
+        lblFactura.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblFactura.setText("  Factura:");
+        jPanel3.add(lblFactura);
+
+        txtFactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFacturaActionPerformed(evt);
+            }
+        });
+        jPanel3.add(txtFactura);
+
+        btnConfirmarDatos.setText("Ver Datos");
+        btnConfirmarDatos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfirmarDatosActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnConfirmarDatos);
+
+        btnXml.setText("XML");
+        btnXml.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXmlActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnXml);
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Información Tributaria"));
+        jPanel4.setLayout(new java.awt.GridLayout(3, 0, 0, 3));
+
+        jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel3.setText("Razon Social:");
+        jPanel5.add(jLabel3);
+
+        txtRazonSocial.setEditable(false);
+        txtRazonSocial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRazonSocialActionPerformed(evt);
+            }
+        });
+        jPanel5.add(txtRazonSocial);
+
+        jLabel4.setText("  Nombre Comercial:");
+        jPanel5.add(jLabel4);
+
+        txtNombreComercial.setEditable(false);
+        jPanel5.add(txtNombreComercial);
+
+        jPanel4.add(jPanel5);
+
+        jPanel6.setLayout(new javax.swing.BoxLayout(jPanel6, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel9.setText("Matriz:");
+        jPanel6.add(jLabel9);
+
+        txtMatriz.setEditable(false);
+        jPanel6.add(txtMatriz);
+
+        jPanel4.add(jPanel6);
+
+        jPanel7.setLayout(new javax.swing.BoxLayout(jPanel7, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel6.setText("  Establecimiento:");
+        jPanel7.add(jLabel6);
+
+        txtEstablecimiento.setEditable(false);
+        jPanel7.add(txtEstablecimiento);
+
+        jLabel7.setText("  Pto Emision:");
+        jPanel7.add(jLabel7);
+
+        txtPtoEmision.setEditable(false);
+        jPanel7.add(txtPtoEmision);
+
+        jLabel8.setText("  Secuencial:");
+        jPanel7.add(jLabel8);
+
+        txtSecuencial.setEditable(false);
+        jPanel7.add(txtSecuencial);
+
+        jLabel24.setText("  Identificacion:");
+        jPanel7.add(jLabel24);
+
+        txtDocumento.setEditable(false);
+        txtDocumento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDocumentoActionPerformed(evt);
+            }
+        });
+        jPanel7.add(txtDocumento);
+
+        jPanel4.add(jPanel7);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 274, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 132, Short.MAX_VALUE))
         );
 
-        getAccessibleContext().setAccessibleName(".:: GUIAS REMISION ::.");
+        jTabbedPane1.addTab("Guia Remisión", jPanel1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 892, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 250, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Emisión", jPanel2);
+
+        pnlGuiaRemision.add(jTabbedPane1);
+
+        getContentPane().add(pnlGuiaRemision);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFacturaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFacturaActionPerformed
+
+    private void btnConfirmarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarDatosActionPerformed
+        // TODO add your handling code here:
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+//                    confirmarDatos();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_btnConfirmarDatosActionPerformed
+
+    private void btnXmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXmlActionPerformed
+        // TODO add your handling code here:
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+//                    generacionXML();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_btnXmlActionPerformed
+
+    private void txtRazonSocialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRazonSocialActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRazonSocialActionPerformed
+
+    private void txtDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDocumentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDocumentoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnConfirmarDatos;
+    private javax.swing.JButton btnXml;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblFactura;
+    private javax.swing.JPanel pnlGuiaRemision;
+    private javax.swing.JTextField txtDocumento;
+    private javax.swing.JTextField txtEstablecimiento;
+    private javax.swing.JTextField txtFactura;
+    private javax.swing.JTextField txtMatriz;
+    private javax.swing.JTextField txtNombreComercial;
+    private javax.swing.JTextField txtPtoEmision;
+    private javax.swing.JTextField txtRazonSocial;
+    private javax.swing.JTextField txtSecuencial;
     // End of variables declaration//GEN-END:variables
 }

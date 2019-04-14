@@ -333,4 +333,12 @@ public class Util {
     public static void enableButton(JButton button, boolean flag) {
         button.setEnabled(flag);
     }
+    
+    public static String getText(javax.swing.JTextField field) {
+        return field.getText();
+    }
+    
+    public static void setText(javax.swing.JTextField field, String texto) {
+        field.setText(texto);
+    }
 }

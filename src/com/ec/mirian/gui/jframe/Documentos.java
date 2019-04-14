@@ -7,6 +7,7 @@ package com.ec.mirian.gui.jframe;
 
 import com.ec.mirian.internalFrame.IFactura;
 import com.ec.mirian.internalFrame.IGuiaRemision;
+import com.ec.mirian.internalFrame.Iconfiguracion;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,8 +20,9 @@ import javax.swing.JInternalFrame;
  */
 public class Documentos extends javax.swing.JFrame {
 
-    static IFactura iFactura;
-    static IGuiaRemision iGuia;
+    private static IFactura iFactura;
+    private static IGuiaRemision iGuia;
+    private static Iconfiguracion iconfiguracion;
 
     /**
      * Creates new form Documentos
@@ -74,6 +76,11 @@ public class Documentos extends javax.swing.JFrame {
         jPanel1.add(BtnNotaDebito);
 
         BtnConfiguracion.setText("Configuración");
+        BtnConfiguracion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnConfiguracionActionPerformed(evt);
+            }
+        });
         jPanel1.add(BtnConfiguracion);
 
         spPrincipal.setTopComponent(jPanel1);
@@ -131,6 +138,22 @@ public class Documentos extends javax.swing.JFrame {
         restaurarVentana(iGuia);
     }//GEN-LAST:event_btnGuiasActionPerformed
 
+    private void BtnConfiguracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnConfiguracionActionPerformed
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    configuracion();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_BtnConfiguracionActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -175,6 +198,21 @@ public class Documentos extends javax.swing.JFrame {
         } catch (Exception ex) {
             Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void configuracion() {
+        if(iconfiguracion == null || iconfiguracion.isClosed()){
+            iconfiguracion =  new Iconfiguracion();
+            destokp.add(iconfiguracion);
+        } else {
+            try {
+                iconfiguracion.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                iconfiguracion = null;
+                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        restaurarVentana(iconfiguracion);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
