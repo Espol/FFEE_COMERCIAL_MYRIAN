@@ -6,7 +6,7 @@
 package com.ec.mirian.service;
 
 import com.ec.mirian.enumerado.TipoDocumentoEnum;
-import com.ec.mirian.gui.VentanaPrincipal;
+import com.ec.mirian.gui.jframe.VentanaPrincipal;
 import com.ec.mirian.repository.InformacionRepository;
 import com.ec.mirian.repository.PersonaRepository;
 import com.ec.mirian.repository.VentaRepository;

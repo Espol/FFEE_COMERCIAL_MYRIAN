@@ -14,7 +14,7 @@ import com.ec.mirian.domain.Configuracion;
 import com.ec.mirian.domain.VentfacCabecera;
 import com.ec.mirian.domain.VentfacDetalle;
 import com.ec.mirian.factory.Factory;
-import com.ec.mirian.gui.VentanaPrincipal;
+import com.ec.mirian.gui.jframe.VentanaPrincipal;
 import com.ec.mirian.repository.CargosRepository;
 import com.ec.mirian.util.Util;
 import ec.incloud.ce.bean.factura.Factura;

@@ -5,7 +5,8 @@
  */
 package com.ec.mirian.app;
 
-import com.ec.mirian.gui.VentanaPrincipal;
+import com.ec.mirian.gui.jframe.Documentos;
+import com.ec.mirian.gui.jframe.VentanaPrincipal;
 
 /**
  *
@@ -18,9 +19,11 @@ public class App {
      */
     public static void main(String[] args) {
         
+        Documentos doc = new Documentos();
+        doc.setVisible(true);
         
-        VentanaPrincipal vp = new VentanaPrincipal();
-        vp.setVisible(true);
+//        VentanaPrincipal vp = new VentanaPrincipal();
+//        vp.setVisible(true);
         
 //        ConexionService cs = FactoryService.createConexionService();
 //        Configuracion c = cs.getConfiguracionById(Constante.ID_CONFIGURACION_DEFECTO);
