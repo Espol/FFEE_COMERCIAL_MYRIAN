@@ -6,6 +6,7 @@
 package com.ec.mirian.gui.jframe;
 
 import com.ec.mirian.internalFrame.IFactura;
+import com.ec.mirian.internalFrame.IGuiaRemision;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +19,8 @@ import javax.swing.JInternalFrame;
  */
 public class Documentos extends javax.swing.JFrame {
 
-    static IFactura ifactura;
+    static IFactura iFactura;
+    static IGuiaRemision iGuia;
 
     /**
      * Creates new form Documentos
@@ -58,6 +60,11 @@ public class Documentos extends javax.swing.JFrame {
         jPanel1.add(btnFactura);
 
         btnGuias.setText("Guias");
+        btnGuias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuiasActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnGuias);
 
         BtnNotaCredito.setText("Nota Credito");
@@ -95,19 +102,34 @@ public class Documentos extends javax.swing.JFrame {
 
     private void btnFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFacturaActionPerformed
         // TODO add your handling code here:
-        if (ifactura == null || ifactura.isClosed()) {
-            ifactura = new IFactura();
-            destokp.add(ifactura);
+        if (iFactura == null || iFactura.isClosed()) {
+            iFactura = new IFactura();
+            destokp.add(iFactura);
         } else {
             try {
-                ifactura.setMaximum(true);
+                iFactura.setMaximum(true);
             } catch (PropertyVetoException ex) {
-                ifactura = null;
+                iFactura = null;
                 Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        restaurarVentana(ifactura);
+        restaurarVentana(iFactura);
     }//GEN-LAST:event_btnFacturaActionPerformed
+
+    private void btnGuiasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuiasActionPerformed
+        if (iGuia == null || iGuia.isClosed()) {
+            iGuia = new IGuiaRemision();
+            destokp.add(iGuia);
+        } else {
+            try {
+                iGuia.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                iGuia = null;
+                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        restaurarVentana(iGuia);
+    }//GEN-LAST:event_btnGuiasActionPerformed
 
     /**
      * @param args the command line arguments
