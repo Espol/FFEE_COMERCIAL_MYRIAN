@@ -6,7 +6,8 @@
 package com.ec.mirian.app;
 
 import com.ec.mirian.gui.jframe.Documentos;
-import com.ec.mirian.gui.jframe.VentanaPrincipal;
+import com.ec.mirian.util.Util;
+import java.util.Date;
 
 /**
  *
@@ -20,14 +21,9 @@ public class App {
     public static void main(String[] args) {
         
         Documentos doc = new Documentos();
-        doc.setVisible(true);
+            doc.setVisible(true);
         
-//        VentanaPrincipal vp = new VentanaPrincipal();
-//        vp.setVisible(true);
         
-//        ConexionService cs = FactoryService.createConexionService();
-//        Configuracion c = cs.getConfiguracionById(Constante.ID_CONFIGURACION_DEFECTO);
-//        System.out.println("respuestta: " + c.getXsdfactura() );
         
     }
 }

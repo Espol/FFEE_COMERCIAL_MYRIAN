@@ -63,7 +63,17 @@ public class Util {
             return null;
         }
     }
-
+    
+    public static String getFechaSustento(String fecha) throws ParseException{
+        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").parse(fecha);
+        return getStringFromDate(date, "dd/MM/yyyy");
+    }
+    
+    public static String getFechaMotivoTraslado(String fecha) throws ParseException{
+        Date date = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
+        return getStringFromDate(date, "MMM dd/yyyy");
+    }
+    
     public static synchronized void createDirectory(String path) {
         File directory = new File(path);
         if (directory.isFile()) {

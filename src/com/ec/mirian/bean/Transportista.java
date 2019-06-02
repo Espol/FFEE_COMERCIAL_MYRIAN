@@ -14,6 +14,8 @@ public class Transportista {
     
     private long id;
     private String nombreComercial;
+    private String identificacion;
+    private String direccion;
 
     public long getId() {
         return id;
@@ -34,6 +36,22 @@ public class Transportista {
     @Override
     public String toString(){
         return id + " - " + nombreComercial;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
     
 }

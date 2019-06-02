@@ -86,8 +86,6 @@ public class ConexionService {
         c.setNumPago(Util.stringToBigDecimal(cab[19]));
         c.setGeneradoxventfac(Util.stringToBigInteger(cab[0]));
         c.setGeneradoxpago(BigInteger.ZERO);
-//        CargoConexion cc = Factory.getCargoConexion();
-//        cc.save(c);
         return c;
     }
     
@@ -126,12 +124,19 @@ public class ConexionService {
         ven.setPdf(IFactura.getInstance().getPdf());
         ven.setXmlAutorizado(IFactura.getInstance().getXmlAutorizado());
         ven.setTipo(TipoDocumentoEnum.FACTURA.getCodigo());
+        ven.setNumeroAutorizacion(IFactura.getInstance().getClaveAcceso());
+        ven.setFechaAutorizacion(IFactura.getInstance().getFechaAutorizacion());
         return ven;
     }
     
-    public VentfacCabecera getVentaCabecera(String numVentfac) {
+    public VentfacCabecera getVentaCabeceraByNumVenta(Long numVentfac) {
         VentFacCabeceraConexion vfcc = Factory.getVentFacCabeceraConexion();
-        return vfcc.getCargo(Long.parseLong(numVentfac));
+        return vfcc.getVentfacCabeceraByNumVentfac(numVentfac);
+    }
+    
+    public VentfacCabecera getVentaCabeceraByFactura(String factura) {
+        VentFacCabeceraConexion vfcc = Factory.getVentFacCabeceraConexion();
+        return vfcc.getVentfacCabeceraByFactura(factura);
     }
     
     public Configuracion getConfiguracionById(Integer id) {
@@ -142,6 +147,12 @@ public class ConexionService {
     public void actualizaConfiguracion(Configuracion config) {
         ConfiguracionConexion cc = Factory.getConfiguracionConexion();
         cc.actualizar(config);
+    }
+    
+    public List<VentfacDetalle> getDetalle(VentfacCabecera venta) {
+        VentfactDetalleConexion vd = Factory.getVentfactDetalleConexion();
+        List<VentfacDetalle> list = vd.getVentfacDetalleByNumVentfac(venta);
+        return list;
     }
      
 }

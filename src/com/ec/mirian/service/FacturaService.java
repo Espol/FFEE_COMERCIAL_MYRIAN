@@ -7,6 +7,7 @@ package com.ec.mirian.service;
 
 import com.ec.mirian.enumerado.TipoDocumentoEnum;
 import com.ec.mirian.internalFrame.IFactura;
+import com.ec.mirian.repository.FactoryRepositorio;
 import com.ec.mirian.repository.InformacionRepository;
 import com.ec.mirian.repository.PersonaRepository;
 import com.ec.mirian.repository.VentaRepository;
@@ -55,14 +56,31 @@ public class FacturaService {
     
     private final ClaveAccesoGen claveGenerador = new ClaveAccesoGen();
     private final TipoDocumentoEnum tipo = TipoDocumentoEnum.FACTURA;
+    
+    public String generarFacturaXML() throws SQLException, IOException, XmlException, ClassNotFoundException {
+        factura = new Factura();
+        PropertiesUtil.getInstanceProperties();
+        pathXML = PropertiesUtil.getValorPathXML("mirian.pathXML");
+        factura.setVersion(PropertiesUtil.getValorPathXML("mirian.version"));
+        factura.setId("comprobante");
+        factura.setInfoTributaria(getInfoTributaria());
+        factura.setInfoFactura(getInfoFactura());
+        factura.setDetalles(getDetalles());
+        factura.setInfoAdicional(getListCamposAdicional());
+        getSecuencial();
+        IFactura.getInstance().setSecuencial(factura.getInfoTributaria().getSecuencial());
+        generarClave();
+        IFactura.getInstance().setClaveAcceso(factura.getInfoTributaria().getClaveAcceso());
+        return generarXML();
+    }
 
-    public InfoTributaria getInfoTributaria() throws SQLException, UnsupportedEncodingException, IOException, ClassNotFoundException {
+    private InfoTributaria getInfoTributaria() throws SQLException, UnsupportedEncodingException, IOException, ClassNotFoundException {
         PropertiesUtil.getInstanceProperties();
         String idEmisor = PropertiesUtil.getValorPathXML("mirian.emisor.id");
         
-        InformacionRepository ir = new InformacionRepository();
+        InformacionRepository ir = FactoryRepositorio.createInformacionRepository();
         
-        PersonaRepository pr = new PersonaRepository();
+        PersonaRepository pr = FactoryRepositorio.createPersonaRepository();
         
         InfoTributaria it = new InfoTributaria();
         it.setAmbiente(PropertiesUtil.getValorPathXML("mirian.ambiente"));
@@ -84,7 +102,7 @@ public class FacturaService {
     
     private InfoFactura getInfoFactura() throws SQLException, UnsupportedEncodingException, ClassNotFoundException, IOException{
         InfoFactura info = new InfoFactura();
-        VentaRepository vr = new VentaRepository();
+        VentaRepository vr = FactoryRepositorio.createVentaRepository();
         
         String[] ventaCredito = vr.getVenta(numVentCred);
         PersonaRepository pr = new PersonaRepository();
@@ -159,10 +177,10 @@ public class FacturaService {
         return list;
     }
     
-    private List<FacturaDetalle> getDetalles() throws SQLException {
+    private List<FacturaDetalle> getDetalles() throws SQLException, ClassNotFoundException, IOException {
         List<FacturaDetalle> detalles = new ArrayList<>();
         
-        VentaRepository vr = new VentaRepository();
+        VentaRepository vr = FactoryRepositorio.createVentaRepository();
         List<String[]> ventas =  vr.getDetallesVenta(numVentCred);
         
         for(String[] venta : ventas) {
@@ -241,25 +259,9 @@ public class FacturaService {
     }
     
     private String getNombreFileSecuencial() {
-        return new StringBuilder(factura.getInfoTributaria().getEstab()).append("-").
+        return new StringBuilder(TipoDocumentoEnum.FACTURA.getCodigo()).append("-").
+                append(factura.getInfoTributaria().getEstab()).append("-").
                 append(factura.getInfoTributaria().getEstab()).append(".txt").toString();
-    }
-    
-    public String generarFacturaXML() throws SQLException, IOException, XmlException, ClassNotFoundException {
-        factura = new Factura();
-        PropertiesUtil.getInstanceProperties();
-        pathXML = PropertiesUtil.getValorPathXML("mirian.pathXML");
-        factura.setVersion(PropertiesUtil.getValorPathXML("mirian.version"));
-        factura.setId("comprobante");
-        factura.setInfoTributaria(getInfoTributaria());
-        factura.setInfoFactura(getInfoFactura());
-        factura.setDetalles(getDetalles());
-        factura.setInfoAdicional(getListCamposAdicional());
-        getSecuencial();
-        IFactura.getInstance().setSecuencial(factura.getInfoTributaria().getSecuencial());
-        generarClave();
-        IFactura.getInstance().setClaveAcceso(factura.getInfoTributaria().getClaveAcceso());
-        return generarXML();
     }
     
     public Factura obtenerInformacion() throws SQLException, IOException, XmlException, ClassNotFoundException {
@@ -276,10 +278,10 @@ public class FacturaService {
     }
     
     public void saveInformacion() throws SQLException, ClassNotFoundException, IOException {
-        VentaRepository vr = new VentaRepository();
+        VentaRepository vr = FactoryRepositorio.createVentaRepository();
         String[] venta = vr.getVenta(numVentCred);
         List<String[]> ventasDetalles =  vr.getDetallesVenta(numVentCred);
-        ConexionService cs = new ConexionService();
+        ConexionService cs = FactoryService.createConexionService();
         cs.saveInformacion(venta, ventasDetalles, factura);
     }
 

@@ -31,6 +31,7 @@ import com.mirian.envio.EnvioAutorizar;
 import com.mirian.envio.EnvioRecepcion;
 import com.mirian.pdf.service.PdfFactory;
 import com.mirian.pdf.service.PdfServices;
+import com.mirian.reporte.impreso.ReporteFactura;
 import com.mirian.validacion.exception.ValidacionException;
 import com.mirian.validacion.services.ValidacionFactory;
 import ec.gob.sri.comprobantes.ws.aut.RespuestaComprobante;
@@ -718,7 +719,7 @@ public class IFactura extends javax.swing.JInternalFrame {
                 Util.mostrarError(ex, "Error4 ClassNotFoundException");
             }
         } else {
-            Util.mostrarWarning("Debe ingresar el numero de pedido y Tipo de Documento");
+            Util.mostrarWarning("Debe ingresar el numero de pedido");
         }
     }
 
@@ -753,7 +754,7 @@ public class IFactura extends javax.swing.JInternalFrame {
         fdModel.limpiar();
         tbDetalle.setModel(fdModel);
         for (FacturaDetalle fd : detalles) {
-            fdModel.addRowFacturaDetalleModel(fd);
+            fdModel.addRow(fd);
         }
         tbDetalle.updateUI();
         btnXml.setEnabled(true);
@@ -763,7 +764,7 @@ public class IFactura extends javax.swing.JInternalFrame {
         String numeroPedido = txtNumeroPedido.getText();
         if (numeroPedido != null && !numeroPedido.isEmpty()) {
             ConexionService cs = new ConexionService();
-            VentfacCabecera cab = cs.getVentaCabecera(numeroPedido);
+            VentfacCabecera cab = cs.getVentaCabeceraByNumVenta(Util.stringToLong(numeroPedido));
             if (cab == null) {
                 try {
                     if (emitirAsiMismo() == 0) {
@@ -772,7 +773,7 @@ public class IFactura extends javax.swing.JInternalFrame {
                         gf.setNumVentCred(numeroPedido);
 
                         String xml = gf.generarFacturaXML();
-                        //gf.saveInformacion();//habilitar esta opcion
+                        //gf.Informacion();//habilitar esta opcion
                         Util.setText(txtRutaXml, xml);
                         Util.mostrarExisto("Se Genero XMl con Exito");
                     } else {
@@ -907,11 +908,12 @@ public class IFactura extends javax.swing.JInternalFrame {
                 XStreamAutorizacion.getInstance().generarXml(rc, getPthAutorizado());
                 agregarLog("El Documento se envio a Autorizacion", 1);
                 pathPdf();
-                FacturaService gf = new FacturaService();
+                FacturaService gf = FactoryService.createFacturaService();
                 gf.setNumVentCred(Util.getText(txtNumeroPedido));
                 gf.saveInformacion();//habilitar esta opcion
                 generarPDF(rc);
-                enviarNotificacion();
+//                enviarNotificacion();
+                imprimir();
             } else {
                 agregarLog(estado, 3);
                 agregarLog(fechaAutorizada, 1);
@@ -943,6 +945,17 @@ public class IFactura extends javax.swing.JInternalFrame {
                 rc.getAutorizaciones().getAutorizacion().get(0).getFechaAutorizacion(),
                 null, null, "12");
         agregarLog("PDF generado!...", 1);
+    }
+    
+    private void imprimir() {
+        agregarLog("Imprimiendo PDF!...", 1);
+        ReporteFactura rf = new ReporteFactura();
+        factura.getInfoTributaria().setSecuencial(Util.getText(txtSecuencial));
+        rf.setFactura(factura);
+        rf.setFechaAutorizacion(Util.getText(txtFechaAutorizacion));
+        rf.setNroAutorizacion(Util.getText(txtclaveAcceso));
+        rf.imprimir();
+        agregarLog("impreso existoso!...", 1);
     }
     
     private void enviarNotificacion() throws IOException {
@@ -1109,6 +1122,10 @@ public class IFactura extends javax.swing.JInternalFrame {
         this.correo = correo;
     }
     
+    public String getFechaAutorizacion() {
+        return Util.getText(txtFechaAutorizacion);
+    }
+    
     public String log = "";
     private String correo;
     private Factura factura;
@@ -1212,4 +1229,6 @@ public class IFactura extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtXmlAutorizado;
     private javax.swing.JTextField txtclaveAcceso;
     // End of variables declaration//GEN-END:variables
+
+    
 }

@@ -24,10 +24,10 @@ public class Constante {
     
     
     public static String FACTURA_JASPER = "factura.jasper";
-    public static String NOTACREDITO_JASPER = "factura.jasper";
-    public static String NOTADEBITO_JASPER = "factura.jasper";
-    public static String GUIA_JASPER = "factura.jasper";
-    public static String RETENCION_JASPER = "factura.jasper";
+    public static String NOTACREDITO_JASPER = "notaCredito.jasper";
+    public static String NOTADEBITO_JASPER = "notaDebito.jasper";
+    public static String GUIA_JASPER = "guiaRemision.jasper";
+    public static String RETENCION_JASPER = "comprobanteRetencion.jasper";
     
     public static String AUTORIZADO_COMFIRMACION = "autorizado_confirmacion.html";
     
@@ -41,6 +41,7 @@ public class Constante {
     
     public static String CONSUMIDOR_FINAL = "9999999999";
     
+    public static String MOTIVO_TRASLADO = "Factura No. {0} del {1}";
     
     
     public static String FINAL_RUC = "001";

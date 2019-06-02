@@ -21,6 +21,17 @@ import java.sql.SQLException;
  */
 public class CargosRepository {
     
+    private static CargosRepository instance ;
+    
+    public static CargosRepository getIntance() throws ClassNotFoundException, SQLException, IOException {
+        synchronized(CargosRepository.class){
+            if(instance == null){
+                instance = new CargosRepository();
+            }
+            return instance;
+        }
+    }
+    
     private final Connection conn;
     
     public CargosRepository() throws ClassNotFoundException, SQLException, IOException{

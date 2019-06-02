@@ -7,6 +7,7 @@ package com.ec.mirian.gui.jframe;
 
 import com.ec.mirian.internalFrame.IFactura;
 import com.ec.mirian.internalFrame.IGuiaRemision;
+import com.ec.mirian.internalFrame.INotaCredito;
 import com.ec.mirian.internalFrame.Iconfiguracion;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
@@ -22,6 +23,7 @@ public class Documentos extends javax.swing.JFrame {
 
     private static IFactura iFactura;
     private static IGuiaRemision iGuia;
+    private static INotaCredito iNotaCredito;
     private static Iconfiguracion iconfiguracion;
 
     /**
@@ -70,6 +72,11 @@ public class Documentos extends javax.swing.JFrame {
         jPanel1.add(btnGuias);
 
         BtnNotaCredito.setText("Nota Credito");
+        BtnNotaCredito.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnNotaCreditoActionPerformed(evt);
+            }
+        });
         jPanel1.add(BtnNotaCredito);
 
         BtnNotaDebito.setText("Nota Debito");
@@ -109,33 +116,35 @@ public class Documentos extends javax.swing.JFrame {
 
     private void btnFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFacturaActionPerformed
         // TODO add your handling code here:
-        if (iFactura == null || iFactura.isClosed()) {
-            iFactura = new IFactura();
-            destokp.add(iFactura);
-        } else {
-            try {
-                iFactura.setMaximum(true);
-            } catch (PropertyVetoException ex) {
-                iFactura = null;
-                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    addFactura();
+                } finally {
+                    bloqueador.dispose();
+                }
             }
-        }
-        restaurarVentana(iFactura);
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
     }//GEN-LAST:event_btnFacturaActionPerformed
 
     private void btnGuiasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuiasActionPerformed
-        if (iGuia == null || iGuia.isClosed()) {
-            iGuia = new IGuiaRemision();
-            destokp.add(iGuia);
-        } else {
-            try {
-                iGuia.setMaximum(true);
-            } catch (PropertyVetoException ex) {
-                iGuia = null;
-                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    addGuia();
+                } finally {
+                    bloqueador.dispose();
+                }
             }
-        }
-        restaurarVentana(iGuia);
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
     }//GEN-LAST:event_btnGuiasActionPerformed
 
     private void BtnConfiguracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnConfiguracionActionPerformed
@@ -153,6 +162,23 @@ public class Documentos extends javax.swing.JFrame {
         hilo.start();
         bloqueador.setVisible(true);
     }//GEN-LAST:event_BtnConfiguracionActionPerformed
+
+    private void BtnNotaCreditoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnNotaCreditoActionPerformed
+        // TODO add your handling code here:
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    addNotaCredito();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_BtnNotaCreditoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -213,6 +239,51 @@ public class Documentos extends javax.swing.JFrame {
             }
         }
         restaurarVentana(iconfiguracion);
+    }
+    
+    private void addFactura() {
+        if (iFactura == null || iFactura.isClosed()) {
+            iFactura = new IFactura();
+            destokp.add(iFactura);
+        } else {
+            try {
+                iFactura.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                iFactura = null;
+                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        restaurarVentana(iFactura);
+    }
+    
+    private void addGuia() {
+        if (iGuia == null || iGuia.isClosed()) {
+            iGuia = new IGuiaRemision();
+            destokp.add(iGuia);
+        } else {
+            try {
+                iGuia.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                iGuia = null;
+                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        restaurarVentana(iGuia);
+    }
+    
+    private void addNotaCredito() {
+        if (iNotaCredito == null || iNotaCredito.isClosed()) {
+            iNotaCredito = new INotaCredito();
+            destokp.add(iNotaCredito);
+        } else {
+            try {
+                iNotaCredito.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                iNotaCredito = null;
+                Logger.getLogger(Documentos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        restaurarVentana(iNotaCredito);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

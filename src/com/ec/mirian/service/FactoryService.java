@@ -20,6 +20,10 @@ public class FactoryService {
         return DocumentoService.create();
     }
     
+    public static ComprobanteService createComprobanteService() {
+        return ComprobanteService.create();
+    }
+    
     public static FacturaService createFacturaService() {
         return FacturaService.create();
     }
@@ -30,6 +34,10 @@ public class FactoryService {
     
     public static GuiaService createGuiaService(){
         return GuiaService.create();
+    }
+    
+    public static NotaCreditoService createNotaCreditoService() {
+        return NotaCreditoService.create();
     }
     
 }

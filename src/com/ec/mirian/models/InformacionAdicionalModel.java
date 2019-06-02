@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.ec.mirian.models;
 
-import ec.incloud.ce.bean.factura.FacturaDetalle;
+import ec.incloud.ce.bean.common.CampoAdicional;
+import ec.incloud.ce.bean.common.DetAdicional;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,18 +19,17 @@ import javax.swing.table.TableModel;
  *
  * @author MARCELO
  */
-public class FacturaDetalleModel implements TableModel {
-
-    private final List<FacturaDetalle> detalles = new ArrayList<>();
-
+public class InformacionAdicionalModel implements TableModel {
+    
+    private final List<CampoAdicional> camposAdicionales = new ArrayList<>();
+    
     private final LinkedList listeners = new LinkedList();
-
-    private final String[] nombresColumnas = {"Cod. Principal", "Descripciòn", "Cantidad", "Pre. Unidad", 
-        "SubTotal"};
+    
+    private final String[] nombresColumnas = {"Nombre", "Valor"};
 
     @Override
     public int getRowCount() {
-        return detalles.size();
+        return camposAdicionales.size();
     }
 
     @Override
@@ -53,18 +54,12 @@ public class FacturaDetalleModel implements TableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        FacturaDetalle fd = detalles.get(rowIndex);
+        CampoAdicional da = camposAdicionales.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return fd.getCodigoPrincipal();
+                return da.getNombre();
             case 1:
-                return fd.getDescripcion();
-            case 2:
-                return fd.getCantidad();
-            case 3:
-                return fd.getPrecioUnitario();
-            case 4:
-                return fd.getPrecioTotalSinImpuesto();
+                return da.getValue();
             default:
                 return "";
         }
@@ -72,23 +67,12 @@ public class FacturaDetalleModel implements TableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        FacturaDetalle fd = detalles.get(rowIndex);
+        CampoAdicional da = camposAdicionales.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                fd.setCodigoPrincipal(aValue != null ? aValue.toString() : "");
-                break;
+                da.setNombre(aValue != null ? aValue.toString() : "");
             case 1:
-                fd.setDescripcion(aValue != null ? aValue.toString() : "");
-                break;
-            case 2:
-                fd.setCantidad(aValue != null ? aValue.toString() : "");
-                break;
-            case 3:
-                fd.setPrecioUnitario(aValue != null ? aValue.toString() : "");
-                break;
-            case 4:
-                fd.setPrecioTotalSinImpuesto(aValue != null ? aValue.toString() : "");
-                break;
+                da.setValue(aValue != null ? aValue.toString() : "");
         }
     }
 
@@ -101,7 +85,7 @@ public class FacturaDetalleModel implements TableModel {
     public void removeTableModelListener(TableModelListener l) {
         listeners.remove(l);
     }
-
+    
     private void avisaSuscriptores(TableModelEvent evento) {
         int i;
         for (i = 0; i < listeners.size(); i++) {
@@ -109,8 +93,8 @@ public class FacturaDetalleModel implements TableModel {
         }
     }
 
-    public void addRow(FacturaDetalle fd) {
-        detalles.add(fd);
+    public void addRow(CampoAdicional fd) {
+        camposAdicionales.add(fd);
         TableModelEvent evento;
         evento = new TableModelEvent(this, 
                                     this.getRowCount() - 1, 
@@ -121,10 +105,13 @@ public class FacturaDetalleModel implements TableModel {
     }
     
     public void limpiar() {
-		detalles.clear();
+		camposAdicionales.clear();
 		TableModelEvent evento;
-		evento = new TableModelEvent(this, this.getRowCount() - 1, this.getRowCount() - 1, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
+		evento = new TableModelEvent(this, this.getRowCount() - 1, 
+                        this.getRowCount() - 1, 
+                        TableModelEvent.ALL_COLUMNS, 
+                        TableModelEvent.DELETE);
 		avisaSuscriptores(evento);
 	}
-
+    
 }

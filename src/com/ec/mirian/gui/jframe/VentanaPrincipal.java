@@ -1309,7 +1309,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         String numeroPedido = txtNumeroPedido.getText();
         if (numeroPedido != null && !numeroPedido.isEmpty() && td != null) {
             ConexionService cs = new ConexionService();
-            VentfacCabecera cab = cs.getVentaCabecera(numeroPedido);
+            VentfacCabecera cab = cs.getVentaCabeceraByNumVenta(Util.stringToLong(numeroPedido));
             if (cab == null) {
                 if (td.isFactura()) {
                     try {
@@ -1417,7 +1417,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 cmbTransporte.removeAllItems();
             }
             cmbTransporte.updateUI();
-        } catch (SQLException ex) {
+        } catch (SQLException | ClassNotFoundException | IOException ex) {
             Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -1835,7 +1835,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         fdModel.limpiar();
         tbDetalle.setModel(fdModel);
         for (FacturaDetalle fd : detalles) {
-            fdModel.addRowFacturaDetalleModel(fd);
+            fdModel.addRow(fd);
         }
         tbDetalle.updateUI();
         btnXml.setEnabled(true);
@@ -1872,7 +1872,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         fdModel.limpiar();
         tbDetalle.setModel(fdModel);
         for (FacturaDetalle fd : detalles) {
-            fdModel.addRowFacturaDetalleModel(fd);
+            fdModel.addRow(fd);
         }
         tbDetalle.updateUI();
         btnXml.setEnabled(true);

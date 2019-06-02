@@ -22,6 +22,17 @@ import java.util.List;
  */
 public class InformacionRepository {
     
+    private static InformacionRepository instance ;
+    
+    public static InformacionRepository getIntance() throws ClassNotFoundException, SQLException, IOException {
+        synchronized(InformacionRepository.class){
+            if(instance == null){
+                instance = new InformacionRepository();
+            }
+            return instance;
+        }
+    }
+    
     private final Connection conn;
     
     public InformacionRepository() throws ClassNotFoundException, SQLException, IOException{
@@ -34,7 +45,7 @@ public class InformacionRepository {
         try (PreparedStatement ps = conn.prepareStatement("Select * from sysinfo")) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String[] infor = new String[7];
+                String[] infor = new String[8];
                 infor[0] = Util.getString(rs.getString("num_persona"));
                 infor[1] = Util.getString(rs.getString("ruc_cedident"));//ruc
                 infor[2] = Util.getString(rs.getString("nomb_comer"));
@@ -42,6 +53,7 @@ public class InformacionRepository {
                 infor[4] = Util.getString(rs.getString("telf_1"));
                 infor[5] = Util.getString(rs.getString("e_mail"));
                 infor[6] = Util.getString(rs.getString("pr_iva"));
+                infor[7] = Util.getString(rs.getString("gremi_puntopartida"));
                 informacion.add(infor);
             }   rs.close();
         }
@@ -49,7 +61,7 @@ public class InformacionRepository {
     }
     
     public String[] getInformacionEmisior(String id) throws SQLException{
-        String[] infor = new String[7];
+        String[] infor = new String[8];
         try (PreparedStatement ps = conn.prepareStatement("Select * from sysinfo where num_persona = "+ id)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -61,6 +73,7 @@ public class InformacionRepository {
                 infor[4] = Util.getString(rs.getString("telef1"));
                 infor[5] = Util.getString(rs.getString("e_mail"));
                 infor[6] = Util.getString(rs.getString("pr_iva"));
+                infor[7] = Util.getString(rs.getString("gremi_puntopartida"));
             }   rs.close();
         }
         return infor;

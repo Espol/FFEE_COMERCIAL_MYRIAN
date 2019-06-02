@@ -15,8 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -24,18 +22,21 @@ import java.util.logging.Logger;
  */
 public class PersonaRepository {
     
-    private Connection conn;
+    private static PersonaRepository instance ;
     
-    public PersonaRepository(){
-        try {
-            conn = ConexionUtilSQL.getConnection();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
+    public static PersonaRepository getIntance() throws ClassNotFoundException, SQLException, IOException {
+        synchronized(PersonaRepository.class){
+            if(instance == null){
+                instance = new PersonaRepository();
+            }
+            return instance;
         }
+    }
+    
+    private final Connection conn;
+    
+    public PersonaRepository() throws ClassNotFoundException, SQLException, IOException{
+        conn = ConexionUtilSQL.getConnection();
     }
     
     public String[] getPersona(String id) throws SQLException{
@@ -56,7 +57,7 @@ public class PersonaRepository {
                 persona[10] = Util.getString(rs.getString("casilla"));
                 persona[11] = Util.getString(rs.getString("ciudad"));
                 persona[12] = Util.getString(rs.getString("direccion"));//dir Matriz
-                persona[13] = Util.getString(rs.getString("url") != null ? rs.getString("url") : "");//correo
+                persona[13] = Util.getString(rs.getString("url") != null ? rs.getString("url") : "mmoyanol1180@gmail.com");//correo
                 persona[14] = Util.getString(rs.getString("observa"));
                 persona[15] = Util.getString(rs.getString("prov"));
                 persona[16] = Util.getString(rs.getString("clien"));

@@ -5,7 +5,7 @@
  */
 package com.ec.mirian.models;
 
-import ec.incloud.ce.bean.factura.FacturaDetalle;
+import ec.incloud.ce.bean.guia.GuiaRemisionDetalle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,14 +17,13 @@ import javax.swing.table.TableModel;
  *
  * @author MARCELO
  */
-public class FacturaDetalleModel implements TableModel {
+public class GuiaRemisionDetalleModel implements TableModel {
 
-    private final List<FacturaDetalle> detalles = new ArrayList<>();
+    private final List<GuiaRemisionDetalle> detalles = new ArrayList<>();
 
     private final LinkedList listeners = new LinkedList();
 
-    private final String[] nombresColumnas = {"Cod. Principal", "Descripciòn", "Cantidad", "Pre. Unidad", 
-        "SubTotal"};
+    private final String[] nombresColumnas = {"Cantidad", "Descripciòn"};
 
     @Override
     public int getRowCount() {
@@ -53,18 +52,12 @@ public class FacturaDetalleModel implements TableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        FacturaDetalle fd = detalles.get(rowIndex);
+        GuiaRemisionDetalle gd = detalles.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return fd.getCodigoPrincipal();
+                return gd.getCantidad();
             case 1:
-                return fd.getDescripcion();
-            case 2:
-                return fd.getCantidad();
-            case 3:
-                return fd.getPrecioUnitario();
-            case 4:
-                return fd.getPrecioTotalSinImpuesto();
+                return gd.getDescripcion();
             default:
                 return "";
         }
@@ -72,22 +65,13 @@ public class FacturaDetalleModel implements TableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        FacturaDetalle fd = detalles.get(rowIndex);
+        GuiaRemisionDetalle gd = detalles.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                fd.setCodigoPrincipal(aValue != null ? aValue.toString() : "");
+                gd.setCantidad(aValue != null ? aValue.toString() : "");
                 break;
             case 1:
-                fd.setDescripcion(aValue != null ? aValue.toString() : "");
-                break;
-            case 2:
-                fd.setCantidad(aValue != null ? aValue.toString() : "");
-                break;
-            case 3:
-                fd.setPrecioUnitario(aValue != null ? aValue.toString() : "");
-                break;
-            case 4:
-                fd.setPrecioTotalSinImpuesto(aValue != null ? aValue.toString() : "");
+                gd.setDescripcion(aValue != null ? aValue.toString() : "");
                 break;
         }
     }
@@ -109,22 +93,21 @@ public class FacturaDetalleModel implements TableModel {
         }
     }
 
-    public void addRow(FacturaDetalle fd) {
+    public void addRow(GuiaRemisionDetalle fd) {
         detalles.add(fd);
         TableModelEvent evento;
-        evento = new TableModelEvent(this, 
-                                    this.getRowCount() - 1, 
-                                    this.getRowCount() - 1, 
-                                    TableModelEvent.ALL_COLUMNS, 
-                                    TableModelEvent.INSERT);
+        evento = new TableModelEvent(this,
+                this.getRowCount() - 1,
+                this.getRowCount() - 1,
+                TableModelEvent.ALL_COLUMNS,
+                TableModelEvent.INSERT);
         avisaSuscriptores(evento);
     }
-    
-    public void limpiar() {
-		detalles.clear();
-		TableModelEvent evento;
-		evento = new TableModelEvent(this, this.getRowCount() - 1, this.getRowCount() - 1, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
-		avisaSuscriptores(evento);
-	}
 
+    public void limpiar() {
+        detalles.clear();
+        TableModelEvent evento;
+        evento = new TableModelEvent(this, this.getRowCount() - 1, this.getRowCount() - 1, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
+        avisaSuscriptores(evento);
+    }
 }

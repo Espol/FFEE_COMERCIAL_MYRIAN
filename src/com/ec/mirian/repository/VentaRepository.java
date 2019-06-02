@@ -15,8 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -24,18 +22,21 @@ import java.util.logging.Logger;
  */
 public class VentaRepository {
     
-    private Connection conn;
+    private static VentaRepository instance ;
     
-    public VentaRepository(){
-        try {
-            conn = ConexionUtilSQL.getConnection();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(PersonaRepository.class.getName()).log(Level.SEVERE, null, ex);
+    public static VentaRepository getIntance() throws ClassNotFoundException, SQLException, IOException {
+        synchronized(VentaRepository.class){
+            if(instance == null){
+                instance = new VentaRepository();
+            }
+            return instance;
         }
+    }
+    
+    private final Connection conn;
+    
+    public VentaRepository() throws ClassNotFoundException, SQLException, IOException{
+        conn = ConexionUtilSQL.getConnection();
     }
     
     public String[] getVenta(String id) throws SQLException{

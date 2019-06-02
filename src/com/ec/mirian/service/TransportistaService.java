@@ -7,7 +7,9 @@
 package com.ec.mirian.service;
 
 import com.ec.mirian.bean.Transportista;
+import com.ec.mirian.repository.FactoryRepositorio;
 import com.ec.mirian.repository.PersonaRepository;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +31,16 @@ public class TransportistaService {
         }
     }
     
-    public List<Transportista> getTransportistas() throws SQLException{
+    public List<Transportista> getTransportistas() throws SQLException, ClassNotFoundException, IOException{
         List<Transportista> transportistas = new ArrayList<>();
-        PersonaRepository pr = new PersonaRepository();
+        PersonaRepository pr = FactoryRepositorio.createPersonaRepository();
         List<String[]> list = pr.getTransportista();
         for(String[] str : list ) {
             Transportista t = new Transportista();
             t.setId(Long.parseLong(str[0]));
             t.setNombreComercial(str[18]);
+            t.setIdentificacion(str[1]);
+            t.setDireccion(str[12]);
             transportistas.add(t);
         }
         return transportistas;

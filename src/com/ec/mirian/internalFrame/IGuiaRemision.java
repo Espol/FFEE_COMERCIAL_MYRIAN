@@ -3,10 +3,63 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ec.mirian.internalFrame;
 
+import com.ec.mirian.bean.MailSetting;
+import com.ec.mirian.bean.Transportista;
+import com.ec.mirian.domain.Configuracion;
 import com.ec.mirian.gui.jframe.DLocker;
+import com.ec.mirian.gui.jframe.VentanaPrincipal;
+import com.ec.mirian.models.GuiaRemisionDetalleModel;
+import com.ec.mirian.models.InformacionAdicionalModel;
+import com.ec.mirian.models.TransportistaModel;
+import com.ec.mirian.service.ComprobanteService;
+import com.ec.mirian.service.ConexionService;
+import com.ec.mirian.service.FactoryService;
+import com.ec.mirian.service.GuiaService;
+import com.ec.mirian.service.TransportistaService;
+import com.ec.mirian.so.Linux;
+import com.ec.mirian.so.Mac;
+import com.ec.mirian.so.So;
+import com.ec.mirian.so.Windows;
+import com.ec.mirian.util.Constante;
+import com.ec.mirian.util.PropertiesMail;
+import com.ec.mirian.util.Util;
+import com.ec.mirian.util.XStreamAutorizacion;
+import com.mirian.correo.notificacion.EnviarNotificacion;
+import com.mirian.correo.notificacion.MailProperties;
+import com.mirian.correo.notificacion.Notificacion;
+import com.mirian.envio.EnvioAutorizar;
+import com.mirian.envio.EnvioRecepcion;
+import com.mirian.pdf.service.PdfFactory;
+import com.mirian.pdf.service.PdfServices;
+import com.mirian.validacion.exception.ValidacionException;
+import com.mirian.validacion.services.ValidacionFactory;
+import ec.gob.sri.comprobantes.ws.aut.RespuestaComprobante;
+import ec.gob.sri.comprobantes.ws.rec.RespuestaSolicitud;
+import ec.incloud.ce.bean.common.CampoAdicional;
+import ec.incloud.ce.bean.common.InfoTributaria;
+import ec.incloud.ce.bean.guia.Destinatario;
+import ec.incloud.ce.bean.guia.GuiaRemision;
+import ec.incloud.ce.bean.guia.GuiaRemisionDetalle;
+import ec.incloud.ce.bean.guia.InfoGuiaRemision;
+import ec.incloud.ce.firma.exception.FirmaException;
+import ec.incloud.ce.firma.services.FirmaFactory;
+import ec.incloud.ce.pdf.util.TipoDocumentoEnum;
+import ec.incloud.ce.sri.services.AutorizacionException;
+import ec.incloud.ce.sri.services.RecepcionException;
+import ec.incloud.ce.xml.exception.XmlException;
+import ec.incloud.ce.xml.services.XmlFactory;
+import ec.incloud.ce.xml.services.XmlServices;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -19,6 +72,8 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
      */
     public IGuiaRemision() {
         initComponents();
+        cargarTransportista();
+        cargarConfiguracion();
     }
 
     /**
@@ -54,14 +109,77 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
         txtSecuencial = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
         txtDocumento = new javax.swing.JTextField();
+        pnlInfoGuia = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        txtDireccionPartida = new javax.swing.JTextField();
+        txtTipoId = new javax.swing.JTextField();
+        txtId = new javax.swing.JTextField();
+        txtTransportista = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txtPlaca = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        txtMotivoTraslado = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtFechaInicioTransporte = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtFechaFinTransporte = new javax.swing.JTextField();
+        pnlDestinatario = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        lblTransportista = new javax.swing.JLabel();
+        cmbTransporte = new javax.swing.JComboBox();
+        jLabel12 = new javax.swing.JLabel();
+        txtIdDestinatario = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        txtRazonSocialDestinatario = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        txtDireccionDestinatario = new javax.swing.JTextField();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        txtCodDocSustento = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        txtNumeroDocSustento = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        txtNumeroAutoDocSustento = new javax.swing.JTextField();
+        jLabel19 = new javax.swing.JLabel();
+        txtFechaEmisionDocSustento = new javax.swing.JTextField();
+        jPanel19 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbInfoAdicional = new javax.swing.JTable();
+        jPanel18 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tbDetalle = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txtRutaXml = new javax.swing.JTextField();
+        btnValidar = new javax.swing.JButton();
+        btnRecepcion = new javax.swing.JButton();
+        btnAutorizacion = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel20 = new javax.swing.JLabel();
+        txtXmlAutorizado = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        txtPdf = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        txtclaveAcceso = new javax.swing.JTextField();
+        lblEstado = new javax.swing.JLabel();
+        txtEstado = new javax.swing.JTextField();
+        jLabel22 = new javax.swing.JLabel();
+        txtFechaAutorizacion = new javax.swing.JTextField();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        edtConsola = new javax.swing.JEditorPane();
 
         setClosable(true);
         setMaximizable(true);
         setTitle(".:: GUIAS REMISION ::.");
-        getContentPane().setLayout(new java.awt.GridLayout());
+        getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
-        pnlGuiaRemision.setLayout(new java.awt.GridLayout());
+        pnlGuiaRemision.setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -159,33 +277,301 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
 
         jPanel4.add(jPanel7);
 
+        pnlInfoGuia.setBorder(javax.swing.BorderFactory.createTitledBorder("Información Guia Remisión"));
+        pnlInfoGuia.setLayout(new java.awt.GridLayout());
+
+        jPanel9.setLayout(new javax.swing.BoxLayout(jPanel9, javax.swing.BoxLayout.LINE_AXIS));
+
+        txtDireccionPartida.setVisible(false);
+        txtDireccionPartida.setEditable(false);
+        jPanel9.add(txtDireccionPartida);
+
+        txtTipoId.setVisible(false);
+        txtTipoId.setEditable(false);
+        jPanel9.add(txtTipoId);
+
+        txtId.setVisible(false);
+        txtId.setEditable(false);
+        jPanel9.add(txtId);
+
+        txtTransportista.setVisible(false);
+        txtTransportista.setEditable(false);
+        jPanel9.add(txtTransportista);
+
+        jLabel11.setText("  Placa:");
+        jPanel9.add(jLabel11);
+        jPanel9.add(txtPlaca);
+
+        jLabel15.setText("  Motivo Traslado:");
+        jPanel9.add(jLabel15);
+
+        txtMotivoTraslado.setEditable(false);
+        jPanel9.add(txtMotivoTraslado);
+
+        jLabel2.setText("  Fecha Inicio:");
+        jPanel9.add(jLabel2);
+
+        txtFechaInicioTransporte.setEditable(false);
+        jPanel9.add(txtFechaInicioTransporte);
+
+        jLabel10.setText("  Fecha Fin : ");
+        jPanel9.add(jLabel10);
+
+        txtFechaFinTransporte.setEditable(false);
+        jPanel9.add(txtFechaFinTransporte);
+
+        pnlInfoGuia.add(jPanel9);
+
+        pnlDestinatario.setBorder(javax.swing.BorderFactory.createTitledBorder("Destinatario"));
+
+        jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.LINE_AXIS));
+
+        lblTransportista.setText("Transportista: ");
+        jPanel8.add(lblTransportista);
+
+        cmbTransporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbTransporteActionPerformed(evt);
+            }
+        });
+        jPanel8.add(cmbTransporte);
+
+        jLabel12.setText("  ID:");
+        jPanel8.add(jLabel12);
+
+        txtIdDestinatario.setEditable(false);
+        jPanel8.add(txtIdDestinatario);
+
+        jLabel13.setText("  Razon Social: ");
+        jPanel8.add(jLabel13);
+
+        txtRazonSocialDestinatario.setEditable(false);
+        jPanel8.add(txtRazonSocialDestinatario);
+
+        jPanel11.setLayout(new javax.swing.BoxLayout(jPanel11, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel14.setText("  Dirección:");
+        jPanel11.add(jLabel14);
+
+        txtDireccionDestinatario.setEditable(false);
+        jPanel11.add(txtDireccionDestinatario);
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Documento Sustento"));
+        jPanel12.setLayout(new javax.swing.BoxLayout(jPanel12, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel16.setText("  Codigo:");
+        jPanel12.add(jLabel16);
+
+        txtCodDocSustento.setEditable(false);
+        jPanel12.add(txtCodDocSustento);
+
+        jLabel17.setText("  Número:");
+        jPanel12.add(jLabel17);
+
+        txtNumeroDocSustento.setEditable(false);
+        txtNumeroDocSustento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNumeroDocSustentoActionPerformed(evt);
+            }
+        });
+        jPanel12.add(txtNumeroDocSustento);
+
+        jLabel18.setText("  Autorizacion:");
+        jPanel12.add(jLabel18);
+
+        txtNumeroAutoDocSustento.setEditable(false);
+        jPanel12.add(txtNumeroAutoDocSustento);
+
+        jLabel19.setText("  Fecha:");
+        jPanel12.add(jLabel19);
+
+        txtFechaEmisionDocSustento.setEditable(false);
+        jPanel12.add(txtFechaEmisionDocSustento);
+
+        javax.swing.GroupLayout pnlDestinatarioLayout = new javax.swing.GroupLayout(pnlDestinatario);
+        pnlDestinatario.setLayout(pnlDestinatarioLayout);
+        pnlDestinatarioLayout.setHorizontalGroup(
+            pnlDestinatarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnlDestinatarioLayout.setVerticalGroup(
+            pnlDestinatarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDestinatarioLayout.createSequentialGroup()
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel19.setLayout(new java.awt.GridLayout());
+
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Información Adicional"));
+        jPanel13.setLayout(new java.awt.BorderLayout());
+
+        tbInfoAdicional.setModel(new InformacionAdicionalModel());
+        jScrollPane1.setViewportView(tbInfoAdicional);
+
+        jPanel13.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel19.add(jPanel13);
+
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle"));
+        jPanel18.setLayout(new java.awt.BorderLayout());
+
+        tbDetalle.setModel(new GuiaRemisionDetalleModel());
+        jScrollPane3.setViewportView(tbDetalle);
+
+        jPanel18.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+
+        jPanel19.add(jPanel18);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlInfoGuia, javax.swing.GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
+            .addComponent(pnlDestinatario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(1, 1, 1)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 132, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlInfoGuia, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDestinatario, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Guia Remisión", jPanel1);
+
+        jPanel10.setLayout(new javax.swing.BoxLayout(jPanel10, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel1.setText(" XML: ");
+        jLabel1.setAlignmentY(0.3F);
+        jPanel10.add(jLabel1);
+
+        txtRutaXml.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        txtRutaXml.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRutaXmlActionPerformed(evt);
+            }
+        });
+        jPanel10.add(txtRutaXml);
+
+        btnValidar.setText("Validar XML");
+        btnValidar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnValidarActionPerformed(evt);
+            }
+        });
+        jPanel10.add(btnValidar);
+
+        btnRecepcion.setText("Recepción");
+        btnRecepcion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecepcionActionPerformed(evt);
+            }
+        });
+        jPanel10.add(btnRecepcion);
+
+        btnAutorizacion.setText("Autorizar");
+        btnAutorizacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAutorizacionActionPerformed(evt);
+            }
+        });
+        jPanel10.add(btnAutorizacion);
+
+        jPanel14.setLayout(new javax.swing.BoxLayout(jPanel14, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel20.setText("   Autorizado:  ");
+        jPanel14.add(jLabel20);
+
+        txtXmlAutorizado.setEditable(false);
+        txtXmlAutorizado.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        jPanel14.add(txtXmlAutorizado);
+
+        jLabel21.setText("  PDF:  ");
+        jPanel14.add(jLabel21);
+
+        txtPdf.setEditable(false);
+        txtPdf.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        jPanel14.add(txtPdf);
+
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
+        jPanel15.setLayout(new java.awt.BorderLayout());
+
+        jPanel16.setLayout(new javax.swing.BoxLayout(jPanel16, javax.swing.BoxLayout.LINE_AXIS));
+
+        jLabel5.setText("  Clave de Acceso:  ");
+        jPanel16.add(jLabel5);
+
+        txtclaveAcceso.setEditable(false);
+        jPanel16.add(txtclaveAcceso);
+
+        lblEstado.setText("  Estado:  ");
+        jPanel16.add(lblEstado);
+
+        txtEstado.setEditable(false);
+        jPanel16.add(txtEstado);
+
+        jLabel22.setText("  Fecha Autorizacion:  ");
+        jPanel16.add(jLabel22);
+
+        txtFechaAutorizacion.setEditable(false);
+        jPanel16.add(txtFechaAutorizacion);
+
+        javax.swing.GroupLayout jPanel20Layout = new javax.swing.GroupLayout(jPanel20);
+        jPanel20.setLayout(jPanel20Layout);
+        jPanel20Layout.setHorizontalGroup(
+            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel20Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel20Layout.setVerticalGroup(
+            jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel20Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel15.add(jPanel20, java.awt.BorderLayout.PAGE_START);
+
+        edtConsola.setBorder(null);
+        edtConsola.setContentType("text/html"); // NOI18N
+        jScrollPane4.setViewportView(edtConsola);
+
+        jPanel15.add(jScrollPane4, java.awt.BorderLayout.CENTER);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 892, Short.MAX_VALUE)
+            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 250, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Emisión", jPanel2);
@@ -208,7 +594,7 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    confirmarDatos();
+                    confirmarDatos();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -225,7 +611,7 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
             @Override
             public void run() {
                 try {
-//                    generacionXML();
+                    generacionXML();
                 } finally {
                     bloqueador.dispose();
                 }
@@ -243,34 +629,498 @@ public class IGuiaRemision extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDocumentoActionPerformed
 
+    private void txtNumeroDocSustentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumeroDocSustentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNumeroDocSustentoActionPerformed
+
+    private void cmbTransporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTransporteActionPerformed
+        // TODO add your handling code here:
+        Transportista t = (Transportista) cmbTransporte.getSelectedItem();
+        Util.setText(txtIdDestinatario, t.getIdentificacion());
+        Util.setText(txtRazonSocialDestinatario, t.getNombreComercial());
+        Util.setText(txtDireccionDestinatario, t.getDireccion());
+    }//GEN-LAST:event_cmbTransporteActionPerformed
+
+    private void txtRutaXmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRutaXmlActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRutaXmlActionPerformed
+
+    private void btnValidarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnValidarActionPerformed
+        // TODO add your handling code here:
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    validarAndFirmarXML();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_btnValidarActionPerformed
+
+    private void btnRecepcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecepcionActionPerformed
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    recepcionSRI();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_btnRecepcionActionPerformed
+
+    private void btnAutorizacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutorizacionActionPerformed
+        // TODO add your handling code here:
+        final DLocker bloqueador = new DLocker();
+        Thread hilo = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    autorizadoSRI();
+                } finally {
+                    bloqueador.dispose();
+                }
+            }
+        };
+        hilo.start();
+        bloqueador.setVisible(true);
+    }//GEN-LAST:event_btnAutorizacionActionPerformed
+
+    private void cargarTransportista() {
+        try {
+            TransportistaService ts = TransportistaService.create();
+            List<Transportista> transportistas = ts.getTransportistas();
+            TransportistaModel tm = new TransportistaModel();
+            tm.setTranspostistas(transportistas);
+            cmbTransporte.setModel(tm);
+            cmbTransporte.updateUI();
+        } catch (SQLException ex) {
+            Util.mostrarWarning("Error al Cargar Transportista!..");
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | IOException ex) {
+            Util.mostrarWarning("Error al Cargar Transportista!..");
+            Logger.getLogger(IGuiaRemision.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void confirmarDatos() {
+        String factura = Util.getText(txtFactura);
+        if (factura != null && !factura.isEmpty()) {
+            try {
+                GuiaService gs = FactoryService.createGuiaService();
+                gs.setNumFactura(factura);
+                guia = gs.getInformacion();
+                completarInfoTributaria(guia.getInfoTributaria());
+                completarInfoGuiaRemision(guia.getInfoGuiaRemision());
+                completarDestinatario(guia.getDestinatarios().get(0));
+                completarInfoAdicional(guia.getInfoAdicional());
+                completarMotivoTraslado();
+            } catch (IOException | SQLException | ClassNotFoundException ex) {
+                Util.mostrarError(ex, "Error - Exception");
+                Logger.getLogger(IGuiaRemision.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Util.mostrarError(ex, "Error - Parse Fecha");
+                Logger.getLogger(IGuiaRemision.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            Util.mostrarWarning("Debe ingresar el número de la Factura");
+        }
+    }
+
+    private void completarInfoTributaria(InfoTributaria infoTributaria) {
+        Util.setText(txtRazonSocial, infoTributaria.getRazonSocial());
+        Util.setText(txtNombreComercial, infoTributaria.getRazonSocial());
+        Util.setText(txtMatriz, infoTributaria.getDirMatriz());
+        Util.setText(txtEstablecimiento, infoTributaria.getEstab());
+        Util.setText(txtPtoEmision, infoTributaria.getPtoEmi());
+        Util.setText(txtDocumento, infoTributaria.getRuc());
+    }
+
+    private void completarDestinatario(Destinatario dest) {
+        Util.setText(txtCodDocSustento, dest.getCodDocSustento());
+        Util.setText(txtNumeroDocSustento, dest.getNumDocSustento());
+        Util.setText(txtNumeroAutoDocSustento, dest.getNumAutDocSustento());
+        Util.setText(txtFechaEmisionDocSustento, dest.getFechaEmisionDocSustento());
+        List<GuiaRemisionDetalle> detalles = dest.getDetalles();
+        grdModel.limpiar();
+        tbDetalle.setModel(grdModel);
+        for (GuiaRemisionDetalle fd : detalles) {
+            grdModel.addRow(fd);
+        }
+        tbDetalle.updateUI();
+    }
+
+    private void completarInfoGuiaRemision(InfoGuiaRemision infoGuiaRemision) {
+        Util.setText(txtDireccionPartida, infoGuiaRemision.getDirPartida());
+        Util.setText(txtTransportista, infoGuiaRemision.getRazonSocialTransportista());
+        Util.setText(txtTipoId, infoGuiaRemision.getTipoIdentificacionTransportista());
+        Util.setText(txtId, infoGuiaRemision.getRucTransportista());
+        Util.setText(txtPlaca, infoGuiaRemision.getPlaca());
+        Util.setText(txtFechaInicioTransporte, infoGuiaRemision.getFechaIniTransporte());
+        Util.setText(txtFechaFinTransporte, infoGuiaRemision.getFechaFinTransporte());
+    }
+
+    private void completarInfoAdicional(List<CampoAdicional> infoAdicional) {
+        idModel.limpiar();
+        tbInfoAdicional.setModel(idModel);
+        for (CampoAdicional ca : infoAdicional) {
+            idModel.addRow(ca);
+        }
+        tbInfoAdicional.updateUI();
+    }
+
+    private void completarMotivoTraslado() throws ParseException {
+        String numFactura = Util.getText(txtFactura);
+        String motivoTranslado = Constante.MOTIVO_TRASLADO.
+                replace("{0}", numFactura).
+                replace("{1}", Util.getFechaMotivoTraslado(guia.getDestinatarios().get(0).getFechaEmisionDocSustento()));
+
+        guia.getDestinatarios().get(0).setMotivoTraslado(motivoTranslado);
+        Util.setText(txtMotivoTraslado, motivoTranslado);
+    }
+
+    private void generacionXML() {
+        Transportista trans = (Transportista) cmbTransporte.getSelectedItem();
+        if (trans != null) {
+            try {
+                completarCampos();
+                Util.mostrarExisto("Se Genero XML con Exito");
+            } catch (IOException | XmlException ex) {
+                Util.mostrarError(ex, "Error: ");
+                Logger.getLogger(IGuiaRemision.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            Util.mostrarWarning("Debe seleccionar un Transportista!!");
+        }
+    }
+
+    private void completarCampos() throws IOException, XmlException {
+        ComprobanteService cs = FactoryService.createComprobanteService();
+        guia.getInfoTributaria().setSecuencial(cs.getSecuencial(guia.getInfoTributaria()));
+        guia.getInfoTributaria().setClaveAcceso(cs.generarClave(guia.getInfoTributaria(), guia.getInfoGuiaRemision().getFechaIniTransporte()));
+        Util.setText(txtSecuencial, guia.getInfoTributaria().getSecuencial());
+        Util.setText(txtclaveAcceso, guia.getInfoTributaria().getClaveAcceso());
+        
+        guia.getDestinatarios().get(0).setIdentificacionDestinatario(Util.getText(txtIdDestinatario));
+        guia.getDestinatarios().get(0).setRazonSocialDestinatario(Util.getText(txtRazonSocialDestinatario));
+        guia.getDestinatarios().get(0).setDirDestinatario(Util.getText(txtDireccionDestinatario));
+        
+        GuiaService gs = FactoryService.createGuiaService();
+        Util.setText(txtRutaXml, gs.generarXML(guia));
+    }
+
+    private void cargarConfiguracion() {
+        config = getConfiguracion();
+    }
+
+    private Configuracion getConfiguracion() {
+        ConexionService cs = FactoryService.createConexionService();
+        return cs.getConfiguracionById(Constante.ID_CONFIGURACION_DEFECTO);
+    }
+
+    private void validarAndFirmarXML() {
+        try {
+            agregarTextoAEditorConsola("<html>");
+            firmarXML();
+            validarXML();
+        } catch (FirmaException | ValidacionException | XmlException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(IGuiaRemision.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void firmarXML() throws FirmaException {
+        String xml = Util.getText(txtRutaXml);
+        FirmaFactory.createFirmaServices().firma(xml,
+                config.getFirma(),
+                config.getClaveFirma());
+        agregarLog("Se realizo la firma Electronica del XML", 1);
+    }
+    
+    private void validarXML() throws ValidacionException, XmlException, FirmaException {
+        XmlServices<GuiaRemision> xmlServices = XmlFactory.getGuiaRemisionXmlServices();
+        GuiaRemision comprobante = (GuiaRemision) xmlServices.getComprobanteDePathArchivo(txtRutaXml.getText());
+        ValidacionFactory.createValidacionGuiaServices().validar(comprobante, config.getXsdguia());
+        agregarLog("XML se valido Correctamente", 1);
+    }
+    
+    private void agregarLog(String mensaje, int i) {
+        agregarTextoAEditorConsola(obtenerTextoDeEditorConsola() + Util.convierteTextoAFormatoHTML(i, mensaje));
+    }
+    
+    private String obtenerTextoDeEditorConsola() {
+        if (log.length() > 6) {
+            return log.substring(0, log.length() - 7);
+        } else {
+            return log;
+        }
+    }
+
+    private void recepcionSRI() {
+        try {
+            enviarARecepcion();
+        } catch (RecepcionException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void enviarARecepcion() throws RecepcionException {
+        agregarLog("Enviando a Recepcion", 1);
+        RespuestaSolicitud rs = EnvioRecepcion.create().enviarToRecepcion(Util.getText(txtRutaXml));
+        obtenerRespuesta(rs);
+    }
+
+    private void obtenerRespuesta(RespuestaSolicitud rs) {
+        Util.setText(txtEstado, rs.getEstado());
+        if (rs.getEstado().equalsIgnoreCase(Constante.RECIBIDA)) {
+            agregarLog(rs.getEstado(), 1);
+            agregarLog("El Documento se envio a Recepcion", 1);
+        } else {
+            agregarLog(rs.getEstado(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getClaveAcceso(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getIdentificador(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getInformacionAdicional(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getMensaje(), 3);
+            agregarLog(rs.getComprobantes().getComprobante().get(0).getMensajes().getMensaje().get(0).getTipo(), 3);
+        }
+    }
+    
+    public void agregarTextoAEditorConsola(String texto) {
+        log = texto;
+        edtConsola.setText(texto);
+        DefaultCaret caret = (DefaultCaret) edtConsola.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+    }
+    
+    private void autorizadoSRI() {
+        try {
+            agregarLog("Enviando a autorizacion", 1);
+            RespuestaComprobante rc = EnvioAutorizar.create().enviarAutorizar(Util.getText(txtclaveAcceso));
+            obtenerRespuestaComprobante(rc);
+        } catch (IOException | XmlException | AutorizacionException ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            agregarLog(ex.getMessage(), 3);
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void obtenerRespuestaComprobante(RespuestaComprobante rc) throws IOException, XmlException, Exception {
+        if (rc.getAutorizaciones().getAutorizacion() != null
+                && !rc.getAutorizaciones().getAutorizacion().isEmpty()) {
+            String estado = rc.getAutorizaciones().getAutorizacion().get(0).getEstado();
+            String fechaAutorizada = rc.getAutorizaciones().getAutorizacion().get(0).getFechaAutorizacion();
+            Util.setText(txtEstado, estado);
+            Util.setText(txtFechaAutorizacion, fechaAutorizada);
+            if (estado.equalsIgnoreCase(Constante.AUTORIZADO)) {
+                agregarLog(estado, 1);
+                agregarLog(fechaAutorizada, 1);
+                XStreamAutorizacion.getInstance().generarXml(rc, getPthAutorizado());
+                agregarLog("El Documento se envio a Autorizacion", 1);
+                pathPdf();
+                generarPDF(rc);
+//                enviarNotificacion();
+            } else {
+                agregarLog(estado, 3);
+                agregarLog(fechaAutorizada, 1);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getIdentificador(), 3);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getMensaje(), 3);
+                agregarLog(rc.getAutorizaciones().getAutorizacion().get(0).getMensajes().getMensaje().get(0).getInformacionAdicional(), 3);
+            }
+        } else {
+            Util.mostrarWarning("El Documento No ha sido Recepcionado, Por favor volver a enviar a Recepcion");
+        }
+    }
+    
+    private String getPthAutorizado() {
+        String xmlAutorizado = Util.getText(txtRutaXml).replace(td.getDirectorio() + "/", td.getDirectorio() + "/AUTORIZADO/");
+        Util.setText(txtXmlAutorizado, xmlAutorizado);
+        return xmlAutorizado;
+    }
+    
+    private void generarPDF(RespuestaComprobante rc) throws XmlException, Exception {
+        agregarLog("Generando el PDF", 1);
+        PdfServices pdfServices = PdfFactory.createPdfGuiaRemisionServices();
+        pdfServices.setPathIreport(JASPER_ROOT + Constante.GUIA_JASPER);
+        pdfServices.setLogo(Util.getLogo());
+        pdfServices.setPathInfoAdicional(Util.getPathInfoAdicional());
+        XmlServices xmlServices = XmlFactory.getGuiaRemisionXmlServices();
+        pdfServices.generarPdf(xmlServices.getComprobanteDePathArchivo(Util.getText(txtRutaXml)),
+                Util.getText(txtPdf),
+                rc.getAutorizaciones().getAutorizacion().get(0).getNumeroAutorizacion(),
+                rc.getAutorizaciones().getAutorizacion().get(0).getFechaAutorizacion(),
+                null, null, "12");
+        agregarLog("PDF generado!...", 1);
+    }
+    
+    private void enviarNotificacion() throws IOException {
+        agregarLog("Enviando Correo ...", 1);
+        List<String> adjunto = new ArrayList<>();
+        adjunto.add(Util.getText(txtXmlAutorizado));
+        adjunto.add(Util.getText(txtPdf));
+
+        Notificacion notificacion = EnviarNotificacion.AUTORIZADO_CONFIRMACION;
+
+        String sriCorrelativo = Util.getText(txtEstablecimiento) + "-" + Util.getText(txtPtoEmision) + "-" + Util.getText(txtSecuencial);
+        notificacion.enviarCorreo(getMailProperties(getMailSetting()),
+                td.getDescripcion(),
+                sriCorrelativo,
+                Util.getText(txtFactura),
+                "mmoyanol1180@gmail.com",
+                "mmoyanol1180@gmail.com", NOTIFICACION_ROOT + Constante.AUTORIZADO_COMFIRMACION, adjunto);
+        agregarLog("Correo Enviado", 1);
+    }
+
+    public MailSetting getMailSetting() throws UnsupportedEncodingException, IOException {
+        MailSetting ms = new MailSetting();
+        PropertiesMail.getInstanceProperties();
+        ms.setHost(PropertiesMail.getValorAcceso("mail.smtp.host"));
+        ms.setPassword(PropertiesMail.getValorAcceso("mail.smtp.password"));
+        ms.setPort(PropertiesMail.getValorAcceso("mail.smtp.port"));
+        ms.setUser(PropertiesMail.getValorAcceso("mail.smtp.user"));
+        return ms;
+    }
+    
+    private MailProperties getMailProperties(final MailSetting ms) {
+        return new MailProperties() {
+
+            @Override
+            public String getHost() {
+                return ms.getHost();
+            }
+
+            @Override
+            public String getPort() {
+                return ms.getPort();
+            }
+
+            @Override
+            public String getUsuario() {
+                return ms.getUser();
+            }
+
+            @Override
+            public String getPassword() {
+                return ms.getPassword();
+            }
+        };
+    }
+    
+    public void pathPdf() {
+        Util.setText(txtPdf, Util.getText(txtXmlAutorizado).replace(".xml", ".pdf"));
+    }
+    
+    private final GuiaRemisionDetalleModel grdModel = new GuiaRemisionDetalleModel();
+    private final InformacionAdicionalModel idModel = new InformacionAdicionalModel();
+    private final TipoDocumentoEnum td = TipoDocumentoEnum.GUIA;
+    private final String JASPER_ROOT = So.isWindows() ? Windows.JASPER_ROOT : (So.isMac() ? Mac.JASPER_ROOT : Linux.JASPER_ROOT);
+    private final String NOTIFICACION_ROOT = So.isWindows() ? Windows.NOTIFICACION_ROOT : (So.isMac() ? Mac.NOTIFICACION_ROOT : Linux.NOTIFICACION_ROOT);
+    private GuiaRemision guia;
+    private Configuracion config;
+    private String log ="";
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAutorizacion;
     private javax.swing.JButton btnConfirmarDatos;
+    private javax.swing.JButton btnRecepcion;
+    private javax.swing.JButton btnValidar;
     private javax.swing.JButton btnXml;
+    private javax.swing.JComboBox cmbTransporte;
+    private javax.swing.JEditorPane edtConsola;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblEstado;
     private javax.swing.JLabel lblFactura;
+    private javax.swing.JLabel lblTransportista;
+    private javax.swing.JPanel pnlDestinatario;
     private javax.swing.JPanel pnlGuiaRemision;
+    private javax.swing.JPanel pnlInfoGuia;
+    private javax.swing.JTable tbDetalle;
+    private javax.swing.JTable tbInfoAdicional;
+    private javax.swing.JTextField txtCodDocSustento;
+    private javax.swing.JTextField txtDireccionDestinatario;
+    private javax.swing.JTextField txtDireccionPartida;
     private javax.swing.JTextField txtDocumento;
     private javax.swing.JTextField txtEstablecimiento;
+    private javax.swing.JTextField txtEstado;
     private javax.swing.JTextField txtFactura;
+    private javax.swing.JTextField txtFechaAutorizacion;
+    private javax.swing.JTextField txtFechaEmisionDocSustento;
+    private javax.swing.JTextField txtFechaFinTransporte;
+    private javax.swing.JTextField txtFechaInicioTransporte;
+    private javax.swing.JTextField txtId;
+    private javax.swing.JTextField txtIdDestinatario;
     private javax.swing.JTextField txtMatriz;
+    private javax.swing.JTextField txtMotivoTraslado;
     private javax.swing.JTextField txtNombreComercial;
+    private javax.swing.JTextField txtNumeroAutoDocSustento;
+    private javax.swing.JTextField txtNumeroDocSustento;
+    private javax.swing.JTextField txtPdf;
+    private javax.swing.JTextField txtPlaca;
     private javax.swing.JTextField txtPtoEmision;
     private javax.swing.JTextField txtRazonSocial;
+    private javax.swing.JTextField txtRazonSocialDestinatario;
+    private javax.swing.JTextField txtRutaXml;
     private javax.swing.JTextField txtSecuencial;
+    private javax.swing.JTextField txtTipoId;
+    private javax.swing.JTextField txtTransportista;
+    private javax.swing.JTextField txtXmlAutorizado;
+    private javax.swing.JTextField txtclaveAcceso;
     // End of variables declaration//GEN-END:variables
 }
